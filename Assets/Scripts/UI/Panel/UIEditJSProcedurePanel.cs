@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Pool;
 
-public class UIEditJSProcedurePanel : UIBasePanel
+public class UIEditJSProcedurePanel : UIWindowPanel
 {
     [NonSerialized] public TMPro.TMP_InputField ChatInput;
     [NonSerialized] public UnityEngine.UI.Button SendBtn;
@@ -26,9 +26,9 @@ public class UIEditJSProcedurePanel : UIBasePanel
 
     private OpenAIService service;
     private readonly List<ChatMessage> messages = new();
-    private readonly List<MyMessage> myMessages = new();
+    private readonly List<MyAIMessage> myMessages = new();
 
-    private UIDefineJSProcedureBlock block;
+    private UIDefineJSProcedureNode node;
 
     private ObjectPool<StringBuilder> stringBuilderPool;
 
@@ -56,7 +56,7 @@ public class UIEditJSProcedurePanel : UIBasePanel
             BaseDomain = config.BaseDomain
         });
 
-        AddModelLayerMessage(new MyMessage(ChatCompletionRole.System, string.Join('\n', config.SystemPrompt)));
+        AddModelLayerMessage(new MyAIMessage(ChatCompletionRole.System, string.Join('\n', config.SystemPrompt)));
 
         ChatInput.onValueChanged.AddListener(OnInputValueChange);
         OnInputValueChange(ChatInput.text);
@@ -70,15 +70,15 @@ public class UIEditJSProcedurePanel : UIBasePanel
         CodeInput.onValueChanged.AddListener(OnCodeInputValueChange);
     }
 
-    public void Set(UIDefineJSProcedureBlock block)
+    public void Set(UIDefineJSProcedureNode node)
     {
-        this.block = block;
-        CodeInput.SetTextWithoutNotify(block.Code);
+        this.node = node;
+        CodeInput.SetTextWithoutNotify(node.Code);
     }
 
     private void OnCodeInputValueChange(string value)
     {
-        block.Code = value;
+        node.Code = value;
     }
 
     private bool CanSend(string text)
@@ -102,7 +102,7 @@ public class UIEditJSProcedurePanel : UIBasePanel
         SendBtn.interactable = CanSend(value);
     }
 
-    private async UniTask<UIAIChatItem> AddUIMessage(MyMessage message)
+    private async UniTask<UIAIChatItem> AddUIMessage(MyAIMessage message)
     {
         var gos = await InstantiateAsync(AIChatItemPrefab, ScrollContent).ToUniTask();
         var go = gos.First();
@@ -112,7 +112,7 @@ public class UIEditJSProcedurePanel : UIBasePanel
         return item;
     }
 
-    private void AddModelLayerMessage(MyMessage message)
+    private void AddModelLayerMessage(MyAIMessage message)
     {
         myMessages.Add(message);
         messages.Add(message.GetChatMessage());
@@ -191,19 +191,19 @@ public class UIEditJSProcedurePanel : UIBasePanel
         ChatInput.ActivateInputField();
 
         // 添加用户消息
-        var userMessage = new MyMessage(ChatCompletionRole.User, userInput);
+        var userMessage = new MyAIMessage(ChatCompletionRole.User, userInput);
 
         // 添加用户消息到模型层和 UI 层
         AddModelLayerMessage(userMessage);
         await AddUIMessage(userMessage);
 
         // 添加代码消息到模型层
-        var codeMessage = new MyMessage(ChatCompletionRole.User, block.Code);
+        var codeMessage = new MyAIMessage(ChatCompletionRole.User, node.Code);
         AddModelLayerMessage(codeMessage);
 
         // 从池中获取StringBuilder
         var currentSb = stringBuilderPool.Get();
-        var aiMessage = new MyMessage(ChatCompletionRole.Assistant, currentSb);
+        var aiMessage = new MyAIMessage(ChatCompletionRole.Assistant, currentSb);
         var item = await AddUIMessage(aiMessage);
 
         try

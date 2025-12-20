@@ -1,15 +1,15 @@
-﻿[ASTModel(typeof(AndBlock))]
-public class UIAndBlock : UIExpressionBlock
-{
-    public UIExpressionField left;
-    public UIExpressionField right;
-
-    public override BaseBlock ToAST()
-    {
-        return new AndBlock
-        {
-            // left = left.GetAST(),
-            // right = right.GetAST()
-        };
-    }
-}
+﻿// [ASTModel(typeof(AndNode))]
+// public class UIAndBlock : UIExpressionBlock
+// {
+//     public UIExpressionField left;
+//     public UIExpressionField right;
+//
+//     public override BaseNode ToAST()
+//     {
+//         return new AndNode
+//         {
+//             // left = left.GetAST(),
+//             // right = right.GetAST()
+//         };
+//     }
+// }

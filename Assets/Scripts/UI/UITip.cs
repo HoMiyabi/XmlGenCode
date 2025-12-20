@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class UITip : UIBaseSubView
+public class UITip : UIBaseView
 {
     [NonSerialized] public TMPro.TextMeshProUGUI TipText;
 

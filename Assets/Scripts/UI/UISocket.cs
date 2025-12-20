@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-public class UISocket : MonoBehaviour
+public class UISocket : UIBaseView
 {
     [SerializeField] private Transform connectPlace;
-    public UIBaseBlock UIBaseBlock { get; private set; }
+    public UIBaseNode UIBaseNode { get; private set; }
 
     public Type canConnectBaseType;
     public event Action OnSetConnectTip;
@@ -14,12 +14,12 @@ public class UISocket : MonoBehaviour
 
     public bool CanConnect(Type type)
     {
-        return UIBaseBlock == null && (type == canConnectBaseType || type.IsSubclassOf(canConnectBaseType));
+        return UIBaseNode == null && (type == canConnectBaseType || type.IsSubclassOf(canConnectBaseType));
     }
 
     public void SetConnectTip()
     {
-        if (UIBaseBlock != null)
+        if (UIBaseNode != null)
         {
             Debug.LogWarning("Can't connect");
             return;
@@ -29,7 +29,7 @@ public class UISocket : MonoBehaviour
 
     public void ClearConnectTip()
     {
-        if (UIBaseBlock != null)
+        if (UIBaseNode != null)
         {
             Debug.LogWarning("Can't connect");
             return;
@@ -37,42 +37,40 @@ public class UISocket : MonoBehaviour
         OnClearConnectTip?.Invoke();
     }
 
-    public void Connect(UIBaseBlock uiBaseBlock)
+    public void Connect(UIBaseNode uiBaseNode)
     {
-        if (UIBaseBlock != null)
+        if (UIBaseNode != null)
         {
             Debug.LogWarning("Can't connect");
             return;
         }
-        UIBaseBlock = uiBaseBlock;
+        UIBaseNode = uiBaseNode;
 
         // var fitter = ConnectedTrans.GetComponent<ContentSizeFitter>();
         // Destroy(fitter);
 
-        UIBaseBlock.transform.SetParent(connectPlace, false);
+        UIBaseNode.transform.SetParent(connectPlace, false);
         OnConnect?.Invoke();
     }
 
-    public void Disconnect(UIBaseBlock uiBaseBlock)
+    public void Disconnect(UIBaseNode uiBaseNode)
     {
-        if (UIBaseBlock == null || UIBaseBlock != uiBaseBlock)
+        if (UIBaseNode == null || UIBaseNode != uiBaseNode)
         {
             Debug.LogWarning("Can't disconnect");
             return;
         }
 
-        UIBaseBlock.transform.SetParent(UIBaseBlock.main.UIBlockGraph.BlockRoot, true);
-
         // var fitter = ConnectedTrans.gameObject.AddComponent<ContentSizeFitter>();
         // fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
         // fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-        UIBaseBlock = null;
+        UIBaseNode = null;
         OnDisconnect?.Invoke();
     }
 
-    public BaseBlock GetAST()
+    public BaseNode GetAST()
     {
-        return UIBaseBlock?.GetComponent<UIBaseBlock>().ToAST();
+        return UIBaseNode?.GetComponent<UIBaseNode>().ToAST();
     }
 }

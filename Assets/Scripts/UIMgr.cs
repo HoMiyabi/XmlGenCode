@@ -7,7 +7,7 @@ public class UIMgr : UnitySingleton<UIMgr>
     public T OpenPanel<T>() where T : UIBasePanel
     {
         var panel = Instantiate(Resources.Load<T>("Prefab/Panel/" + typeof(T).Name), canvas.transform);
-        panel.Open();
+        panel.Show();
         return panel;
     }
 

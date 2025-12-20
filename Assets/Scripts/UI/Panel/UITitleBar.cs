@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine.EventSystems;
 
-public class UITitleBar : UIBaseSubView, IBeginDragHandler, IDragHandler
+public class UITitleBar : UIBaseView, IBeginDragHandler, IDragHandler
 {
     [NonSerialized] public TMPro.TextMeshProUGUI TitleText;
     [NonSerialized] public UnityEngine.UI.Button CloseBtn;
@@ -11,7 +11,7 @@ public class UITitleBar : UIBaseSubView, IBeginDragHandler, IDragHandler
 
     public void SetPanel(UIBasePanel panel)
     {
-        CloseBtn.onClick.AddListener(panel.Close);
+        CloseBtn.onClick.AddListener(panel.Hide);
     }
 
     public void OnBeginDrag(PointerEventData eventData)

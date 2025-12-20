@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIEdgeBar : MonoBehaviour, IBeginDragHandler, IDragHandler
+public class UIEdgeBar : UIBaseView, IBeginDragHandler, IDragHandler
 {
     public RectTransform Space;
     public Action<Vector2> UpdateDrag;

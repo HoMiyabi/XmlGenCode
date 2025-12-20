@@ -1,12 +1,12 @@
 ﻿using Nobi.UiRoundedCorners;
 using UnityEngine;
 
-public class UICapsuleCorner : MonoBehaviour
+public class UICapsuleCorner : UIBaseView
 {
     [SerializeField] private ImageWithRoundedCorners corners;
     private RectTransform rectTransform;
 
-    private void Awake()
+    protected override void Awake()
     {
         rectTransform = (RectTransform)transform;
     }

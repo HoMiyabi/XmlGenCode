@@ -1,7 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 
-public class UILogItem : MonoBehaviour
+public class UILogItem : UIBaseView
 {
     public TMP_Text Text;
 }

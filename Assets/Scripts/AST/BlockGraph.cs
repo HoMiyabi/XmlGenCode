@@ -6,7 +6,7 @@ using System.Text;
 using System.Xml.Serialization;
 using UnityEngine;
 
-public class BlockGraph : IASTNode
+public class BlockGraph
 {
     public Vector2 blockRootAnchoredPosition;
     public float blockRootLocalScale;
@@ -24,20 +24,20 @@ public class BlockGraph : IASTNode
 
     private static Type[] GetXmlExtraTypes()
     {
-        var list = typeof(BaseBlock).Assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(BaseBlock))).ToList();
+        var list = typeof(BaseNode).Assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(BaseNode))).ToList();
         return list.ToArray();
     }
 
     public void ToCode(CodeBuilder cb)
     {
         var blocks = blockGroups
-            .Where(b => b.first is DefineJSProcedureBlock or StartBlock)
+            .Where(b => b.first is DefineJsProcedureNode or StartNode)
             .OrderBy(b =>
             {
                 return b.first switch
                 {
-                    DefineJSProcedureBlock => 0,
-                    StartBlock => 2,
+                    DefineJsProcedureNode => 0,
+                    StartNode => 2,
                     _ => 1
                 };
             }).ToList();

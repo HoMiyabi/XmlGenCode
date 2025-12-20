@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIConsolePanel : UIBasePanel
+public class UIConsolePanel : UIWindowPanel
 {
     public RectTransform LogRoot;
     public GameObject LogItemPrefab;
@@ -10,7 +10,6 @@ public class UIConsolePanel : UIBasePanel
     protected override void Start()
     {
         base.Start();
-        TitleBar.TitleText.text = "控制台";
 
         foreach (string log in PuerTSLogMgr.Instance.Logs)
         {

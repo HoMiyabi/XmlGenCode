@@ -2,13 +2,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIAIChatItem : MonoBehaviour
+public class UIAIChatItem : UIBaseView
 {
     [SerializeField] private TMPro.TMP_Text ChatText;
     [SerializeField] private HorizontalLayoutGroup LayoutGroup;
-    private MyMessage message;
+    private MyAIMessage message;
 
-    public MyMessage Message
+    public MyAIMessage Message
     {
         get => message;
         set
