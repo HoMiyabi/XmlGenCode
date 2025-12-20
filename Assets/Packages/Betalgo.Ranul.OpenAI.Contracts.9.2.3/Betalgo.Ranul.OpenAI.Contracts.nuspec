@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Betalgo.Ranul.OpenAI.Contracts</id>
+    <version>9.2.3</version>
+    <title>OpenAI SDK Contracts by Betalgo</title>
+    <authors>Tolga Kayhan, Betalgo</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Betalgo-Ranul-OpenAI-icon.png</icon>
+    <readme>Readme.md</readme>
+    <projectUrl>https://openai.com/</projectUrl>
+    <description>Contracts and shared types for the Betalgo OpenAI .NET SDK.</description>
+    <tags>openAI,realtime,chatGPT,gpt-4,gpt-3,DALL·E,whisper,azureOpenAI,ai,betalgo,NLP,dalle,dall-e,OpenAI,contracts</tags>
+    <repository type="git" url="https://github.com/betalgo/openai/" commit="ccf4735bff9ef773f5185cc8884ad85603fa1264" />
+    <dependencies>
+      <group targetFramework="net8.0" />
+      <group targetFramework="net9.0" />
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="System.Text.Json" version="8.0.5" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

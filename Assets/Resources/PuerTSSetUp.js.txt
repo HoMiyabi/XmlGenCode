@@ -1,0 +1,20 @@
+// 1. 缓存原生 console.log，避免重定义后无法访问
+const originalConsoleLog = console.log;
+
+// 2. 重新定义 console.log，添加 [PuerTS] 前缀
+console.log = function (...args) {
+  // 分两种情况处理：保证前缀仅添加到文本开头，且不破坏其他参数
+  if (args.length === 0) {
+    // 无参数时，仅输出 [PuerTS]
+    originalConsoleLog.call(console, "[PuerTS]");
+  } else {
+    // 有参数时，给第一个参数拼接前缀（兼容字符串/格式化符）
+    const firstArg = args[0];
+    const prefixedFirstArg = typeof firstArg === "string" 
+      ? `[PuerTS] ${firstArg}` 
+      : `[PuerTS] ${String(firstArg)}`;
+    
+    // 调用原生方法，保证 this 指向 console，参数透传
+    originalConsoleLog.call(console, prefixedFirstArg, ...args.slice(1));
+  }
+};
