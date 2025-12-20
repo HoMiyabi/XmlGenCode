@@ -1,5 +1,4 @@
-﻿[ShowName("与")]
-public class AndNode : ExpressionNode
+﻿public class AndNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

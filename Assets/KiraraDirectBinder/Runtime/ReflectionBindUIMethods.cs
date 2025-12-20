@@ -15,7 +15,7 @@ namespace KiraraDirectBinder
                 var fieldInfo = type.GetField(item.varName, BindingFlags.Instance | BindingFlags.Public);
                 if (fieldInfo == null)
                 {
-                    Debug.LogWarning($"字段不存在, name: {behaviour.name}, varName: {item.varName}");
+                    Debug.LogWarning($"脚本{type.Name}不存在字段{item.varName}, 节点: {behaviour.name}");
                     continue;
                 }
                 if (fieldInfo.FieldType != item.component.GetType())

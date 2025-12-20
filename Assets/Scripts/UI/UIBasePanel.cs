@@ -29,4 +29,9 @@ public abstract class UIBasePanel : UIBaseView
             Hide();
         }
     }
+
+    public void Close()
+    {
+        Destroy(gameObject);
+    }
 }

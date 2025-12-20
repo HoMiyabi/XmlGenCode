@@ -1,16 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-
-[ShowName("循环")]
-public class WhileNode : StatementNode
+﻿public class WhileNode : StatementNode
 {
-    [ShowName("条件")]
     public ExpressionNode condition;
     
-    [ShowName("循环体")]
-    public List<StatementNode> body;
+    public StatementNode loopBody;
 
     public override void ToCode(CodeBuilder cb)
     {
@@ -19,7 +11,7 @@ public class WhileNode : StatementNode
         cb.Append(") {\n");
 
         cb.PushIndent();
-        ToCodeList(cb, body);
+        ToCodeList(cb, loopBody);
         cb.PopIndent();
 
         cb.AppendWithIndent("}");

@@ -20,7 +20,7 @@ public static class XmlSaver
 
     private static readonly Dictionary<Type, XmlSerializer> SerializerCache = new Dictionary<Type, XmlSerializer>();
 
-    public static string SaveToXml(BlockGraph graph, bool formatted = true)
+    public static string SaveToXml(NodeGraph graph, bool formatted = true)
     {
         if (graph == null)
             throw new ArgumentNullException(nameof(graph));
@@ -36,7 +36,7 @@ public static class XmlSaver
             using var ms = new MemoryStream();
             using var writer = XmlWriter.Create(ms, settings);
 
-            var serializer = GetOrCreateSerializer(typeof(BlockGraph), BlockGraph.XmlExtraTypes);
+            var serializer = GetOrCreateSerializer(typeof(NodeGraph), NodeGraph.XmlExtraTypes);
             serializer.Serialize(writer, graph);
 
             return Encoding.UTF8.GetString(ms.ToArray());
@@ -48,7 +48,7 @@ public static class XmlSaver
         }
     }
 
-    public static void SaveToFile(BlockGraph graph, string filePath, bool formatted = true)
+    public static void SaveToFile(NodeGraph graph, string filePath, bool formatted = true)
     {
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentException("文件路径不能为空", nameof(filePath));
@@ -73,7 +73,7 @@ public static class XmlSaver
         }
     }
 
-    public static async void SaveToFileAsync(BlockGraph graph, string filePath, bool formatted = true, Action<float> onProgress = null)
+    public static async void SaveToFileAsync(NodeGraph graph, string filePath, bool formatted = true, Action<float> onProgress = null)
     {
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentException("文件路径不能为空", nameof(filePath));

@@ -1,7 +1,5 @@
-﻿[ShowName("打印")]
-public class PrintNode : StatementNode
+﻿public class PrintNode : StatementNode
 {
-    [ShowName("输入")]
     public ExpressionNode input;
 
     public override void ToCode(CodeBuilder cb)

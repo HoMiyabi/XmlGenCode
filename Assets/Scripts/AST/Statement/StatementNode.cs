@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
-
-public abstract class StatementNode : BaseNode
+﻿public abstract class StatementNode : BaseNode
 {
-    public static void ToCodeList(CodeBuilder cb, List<StatementNode> list)
+    public StatementNode next;
+    
+    public static void ToCodeList(CodeBuilder cb, StatementNode first)
     {
-        foreach (var node in list)
+        StatementNode node = first;
+        while (node != null)
         {
             node.ToCode(cb);
+            node = node.next;
         }
     }
 }

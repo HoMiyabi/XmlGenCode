@@ -11,6 +11,14 @@ public struct AssetItem
 
 public class AssetMgr : UnitySingleton<AssetMgr>
 {
+    public GameObject UIContextMenuPanel;
+    public GameObject UINode;
+    public GameObject UINodeGroup;
+    public GameObject UIDataInputPort;
+    public GameObject UIDataOutputPort;
+    public GameObject UIExecInputPort;
+    public GameObject UIExecOutputPort;
+    
     [SerializeField] private Object add;
     
     [SerializeField] private List<AssetItem> assets;

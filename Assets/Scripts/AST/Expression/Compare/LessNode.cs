@@ -1,5 +1,4 @@
-﻿[ShowName("小于")]
-public class LessNode : ExpressionNode
+﻿public class LessNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

@@ -1,5 +1,4 @@
-﻿[ShowName("大于")]
-public class GreaterNode : ExpressionNode
+﻿public class GreaterNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

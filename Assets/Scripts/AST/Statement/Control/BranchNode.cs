@@ -1,19 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
-
-[ShowName("分支")]
-public class BranchNode : StatementNode
+﻿public class BranchNode : StatementNode
 {
-    [ShowName("条件")]
     public ExpressionNode condition;
     
-    [ShowName("真")]
-    public List<StatementNode> trueBody;
+    public StatementNode trueBody;
     
-    [ShowName("假")]
-    public List<StatementNode> falseBody;
+    public StatementNode falseBody;
 
     public override void ToCode(CodeBuilder cb)
     {

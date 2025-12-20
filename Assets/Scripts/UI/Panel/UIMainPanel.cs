@@ -1,30 +1,25 @@
 ﻿using System;
-using UnityEngine;
 
 public class UIMainPanel : UIBasePanel
 {
+    [NonSerialized] public UICheckBox                FileManagementBtn;
+    [NonSerialized] public UICheckBox                ConsoleBtn;
+    [NonSerialized] public UICheckBox                CodeEditorBtn;
+    [NonSerialized] public UIFileManagementPanel     UIFileManagementPanel;
+    [NonSerialized] public UIConsolePanel            UIConsolePanel;
+    [NonSerialized] public UICodeEditorPanel         UICodeEditorPanel;
     [NonSerialized] public UnityEngine.RectTransform BlockRoot;
-    [NonSerialized] public UICodeEditorPanel         CodeEditorPanel;
-    [NonSerialized] public UIConsolePanel            ConsolePanel;
     [NonSerialized] public UnityEngine.RectTransform Top;
-    [NonSerialized] public UnityEngine.RectTransform SelectContent;
     [NonSerialized] public UnityEngine.UI.Button     GenCodeBtn;
     [NonSerialized] public UnityEngine.UI.Button     RunBtn;
     [NonSerialized] public UnityEngine.UI.Button     GenCodeAndRunBtn;
-    [NonSerialized] public UnityEngine.RectTransform SelectArea;
     [NonSerialized] public UIEdgeBar                 UpEdgeBar;
     [NonSerialized] public UIEdgeBar                 MidEdgeBar;
     [NonSerialized] public UnityEngine.RectTransform PanelRoot;
-    [NonSerialized] public UICheckBox               CodeEditorBtn;
-    [NonSerialized] public UICheckBox               ConsoleBtn;
-    [NonSerialized] public UINodeGraph              UINodeGraph;
+    [NonSerialized] public UINodeGraph               UINodeGraph;
     [NonSerialized] public UnityEngine.UI.Button     SaveBtn;
     [NonSerialized] public UnityEngine.UI.Button     LoadBtn;
-
-    // 内存中的 BlockGraph model 引用
-    [NonSerialized] public BlockGraph               BlockGraphModel;
-
-    public GameObject[] UIBlockPrefabs;
+    
     private readonly PuerTSRunner runner = new();
 
     protected override void Start()
@@ -38,26 +33,21 @@ public class UIMainPanel : UIBasePanel
         // 保存和加载按钮
         // SaveBtn.onClick.AddListener(SaveToModel);
         // LoadBtn.onClick.AddListener(LoadFromModel);
-        //
+        
         // 文件管理
+        FileManagementBtn.OnValueChanged += value => UIFileManagementPanel.SetShowHide(value);
+        UIFileManagementPanel.OnHide += () => FileManagementBtn.SetValue(false, false);
+        UIFileManagementPanel.Hide();
 
         // 控制台
-        ConsoleBtn.OnValueChanged += value => ConsolePanel.SetShowHide(value);
-        ConsolePanel.OnHide += () => ConsoleBtn.SetValue(false, false);
-        ConsolePanel.Hide();
+        ConsoleBtn.OnValueChanged += value => UIConsolePanel.SetShowHide(value);
+        UIConsolePanel.OnHide += () => ConsoleBtn.SetValue(false, false);
+        UIConsolePanel.Hide();
 
         // 代码编辑器
-        CodeEditorBtn.OnValueChanged += value => CodeEditorPanel.SetShowHide(value);
-        CodeEditorPanel.OnHide += () => CodeEditorBtn.SetValue(false, false);
-        CodeEditorPanel.Hide();
-
-        // 拖拽
-        UpEdgeBar.UpdateDrag = delta => { ConsolePanel.RectTransform.sizeDelta += new Vector2(0, delta.y); };
-        MidEdgeBar.UpdateDrag = delta =>
-        {
-            ConsolePanel.RectTransform.sizeDelta += new Vector2(delta.x, 0);
-            CodeEditorPanel.RectTransform.sizeDelta += new Vector2(-delta.x, 0);
-        };
+        CodeEditorBtn.OnValueChanged += value => UICodeEditorPanel.SetShowHide(value);
+        UICodeEditorPanel.OnHide += () => CodeEditorBtn.SetValue(false, false);
+        UICodeEditorPanel.Hide();
     }
 
     private void GenCode()
@@ -75,9 +65,9 @@ public class UIMainPanel : UIBasePanel
     {
         PuerTSLogMgr.Instance.ClearLogs();
 
-        ConsolePanel.Show();
+        UIConsolePanel.Show();
 
-        runner.Run(CodeEditorPanel.CodeInput.text);
+        runner.Run(UICodeEditorPanel.CodeInput.text);
     }
 
     private void GenCodeAndRun()

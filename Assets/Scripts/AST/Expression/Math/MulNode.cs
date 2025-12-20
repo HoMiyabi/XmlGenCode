@@ -1,5 +1,4 @@
-﻿[ShowName("乘")]
-public class MulNode : ExpressionNode
+﻿public class MulNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

@@ -1,5 +1,4 @@
-﻿[ShowName("等于")]
-public class EqualNode : ExpressionNode
+﻿public class EqualNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

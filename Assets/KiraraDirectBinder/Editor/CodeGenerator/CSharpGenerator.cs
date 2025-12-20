@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -12,13 +13,11 @@ namespace KiraraDirectBinder.Editor
             // 类型全名的最大长度
             int typeFullNameMaxLen = GeneratorHelper.GetTypeFullNameMaxLen(binder.items);
 
-            var sb = new StringBuilder();
-
-            foreach ((string fieldName, var com) in binder.items)
-            {
-                sb.AppendLine($"{varModifier} {GeneratorHelper.GetFullNameOrEmpty(com).PadRight(typeFullNameMaxLen)} {fieldName};");
-            }
-            return sb.ToString();
+            string str = string.Join('\n',
+                binder.items.Select(x =>
+                    $"{varModifier} {GeneratorHelper.GetFullNameOrEmpty(x.component).PadRight(typeFullNameMaxLen)} {x.varName};"));
+            
+            return str;
         }
 
         public static string Run(KiraraDirectBinder binder, string bindUIMethodModifier)

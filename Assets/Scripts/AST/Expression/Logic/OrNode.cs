@@ -1,5 +1,4 @@
-﻿[ShowName("或")]
-public class OrNode : ExpressionNode
+﻿public class OrNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

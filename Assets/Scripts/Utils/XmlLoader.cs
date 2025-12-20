@@ -20,7 +20,7 @@ public static class XmlLoader
 
     private static readonly Dictionary<Type, XmlSerializer> SerializerCache = new Dictionary<Type, XmlSerializer>();
 
-    public static BlockGraph LoadFromXml(string xml)
+    public static NodeGraph LoadFromXml(string xml)
     {
         if (string.IsNullOrEmpty(xml))
             throw new ArgumentException("XML内容不能为空", nameof(xml));
@@ -30,9 +30,9 @@ public static class XmlLoader
             using var stringReader = new StringReader(xml);
             using var reader = XmlReader.Create(stringReader, DefaultSettings);
 
-            var serializer = GetOrCreateSerializer(typeof(BlockGraph), BlockGraph.XmlExtraTypes);
+            var serializer = GetOrCreateSerializer(typeof(NodeGraph), NodeGraph.XmlExtraTypes);
 
-            if (serializer.Deserialize(reader) is BlockGraph graph)
+            if (serializer.Deserialize(reader) is NodeGraph graph)
             {
                 Debug.Log("XML加载成功");
                 return graph;
@@ -57,7 +57,7 @@ public static class XmlLoader
         }
     }
 
-    public static BlockGraph LoadFromFile(string filePath)
+    public static NodeGraph LoadFromFile(string filePath)
     {
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentException("文件路径不能为空", nameof(filePath));
@@ -77,7 +77,7 @@ public static class XmlLoader
         }
     }
 
-    public static async System.Threading.Tasks.Task<BlockGraph> LoadFromFileAsync(string filePath, Action<float> onProgress = null)
+    public static async System.Threading.Tasks.Task<NodeGraph> LoadFromFileAsync(string filePath, Action<float> onProgress = null)
     {
         if (string.IsNullOrEmpty(filePath))
             throw new ArgumentException("文件路径不能为空", nameof(filePath));
@@ -137,10 +137,10 @@ public static class XmlLoader
             using var stringReader = new StringReader(xml);
             using var reader = XmlReader.Create(stringReader, DefaultSettings);
 
-            var serializer = GetOrCreateSerializer(typeof(BlockGraph), BlockGraph.XmlExtraTypes);
+            var serializer = GetOrCreateSerializer(typeof(NodeGraph), NodeGraph.XmlExtraTypes);
             var obj = serializer.Deserialize(reader);
 
-            return obj is BlockGraph;
+            return obj is NodeGraph;
         }
         catch
         {

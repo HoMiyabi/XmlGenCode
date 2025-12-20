@@ -1,5 +1,4 @@
-﻿[ShowName("除")]
-public class DivNode : ExpressionNode
+﻿public class DivNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

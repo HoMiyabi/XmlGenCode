@@ -28,7 +28,7 @@ public class UIEditJSProcedurePanel : UIWindowPanel
     private readonly List<ChatMessage> messages = new();
     private readonly List<MyAIMessage> myMessages = new();
 
-    private UIDefineJSProcedureNode node;
+    private DefineJsProcedureNodeUI node;
 
     private ObjectPool<StringBuilder> stringBuilderPool;
 
@@ -70,7 +70,7 @@ public class UIEditJSProcedurePanel : UIWindowPanel
         CodeInput.onValueChanged.AddListener(OnCodeInputValueChange);
     }
 
-    public void Set(UIDefineJSProcedureNode node)
+    public void Set(DefineJsProcedureNodeUI node)
     {
         this.node = node;
         CodeInput.SetTextWithoutNotify(node.Code);

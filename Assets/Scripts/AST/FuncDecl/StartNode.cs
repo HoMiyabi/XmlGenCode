@@ -1,4 +1,5 @@
-﻿public class StartNode : FuncDeclNode
+﻿[ShowName("开始")]
+public class StartNode : FuncDeclNode
 {
     public override void ToCode(CodeBuilder cb)
     {

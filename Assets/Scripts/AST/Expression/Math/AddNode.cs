@@ -1,5 +1,4 @@
-﻿[ShowName("加")]
-public class AddNode : ExpressionNode
+﻿public class AddNode : ExpressionNode
 {
     public ExpressionNode A;
     public ExpressionNode B;

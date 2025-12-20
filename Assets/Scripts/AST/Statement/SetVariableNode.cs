@@ -1,15 +1,12 @@
-﻿[ShowName("设置变量")]
-public class SetVariableNode : StatementNode
+﻿public class SetVariableNode : StatementNode
 {
-    [ShowName("变量名")]
-    public string name;
+    public string varName;
     
-    [ShowName("值")]
     public ExpressionNode value;
 
     public override void ToCode(CodeBuilder cb)
     {
-        cb.AppendWithIndent(name);
+        cb.AppendWithIndent(varName);
         cb.Append(" = ");
         value.ToCode(cb);
         cb.Append(";");

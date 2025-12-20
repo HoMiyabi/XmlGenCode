@@ -1,7 +1,5 @@
-﻿[ShowName("非")]
-public class NotNode : ExpressionNode
+﻿public class NotNode : ExpressionNode
 {
-    [ShowName("输入")]
     public ExpressionNode input;
 
     public override void ToCode(CodeBuilder cb)
