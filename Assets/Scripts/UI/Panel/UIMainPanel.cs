@@ -9,7 +9,6 @@ public class UIMainPanel : UIBasePanel
     [NonSerialized] public UIFileManagementPanel     UIFileManagementPanel;
     [NonSerialized] public UIConsolePanel            UIConsolePanel;
     [NonSerialized] public UICodeEditorPanel         UICodeEditorPanel;
-    [NonSerialized] public UnityEngine.RectTransform BlockRoot;
     [NonSerialized] public UnityEngine.RectTransform Top;
     [NonSerialized] public UnityEngine.UI.Button     GenCodeBtn;
     [NonSerialized] public UnityEngine.UI.Button     RunBtn;
@@ -17,13 +16,29 @@ public class UIMainPanel : UIBasePanel
     [NonSerialized] public UIEdgeBar                 UpEdgeBar;
     [NonSerialized] public UIEdgeBar                 MidEdgeBar;
     [NonSerialized] public UnityEngine.RectTransform PanelRoot;
-    [NonSerialized] public UINodeGraph               UINodeGraph;
     [NonSerialized] public UnityEngine.UI.Button     SaveBtn;
     [NonSerialized] public UnityEngine.UI.Button     LoadBtn;
+    [NonSerialized] public UnityEngine.RectTransform NodeGraphUIRoot;
     
     private readonly PuerTSRunner runner = new();
 
     private string _savedGraphXml;
+    public NodeGraphUI SelectedNodeGraphUI { get; set; }
+
+    public NodeGraphUI AddNodeGraphUI(string content)
+    {
+        var nodeGraph = NodeGraph.FromXml(content);
+        var nodeGraphUI = UIMgr.Instance.Add<NodeGraphUI>(NodeGraphUIRoot);
+        nodeGraphUI.RestoreFromGraph(nodeGraph);
+        
+        return nodeGraphUI;
+    }
+
+    protected override void Awake()
+    {
+        base.Awake();
+        NodeGraphUIRoot.DestroyChildren();
+    }
 
     protected override void Start()
     {
@@ -38,6 +53,7 @@ public class UIMainPanel : UIBasePanel
         LoadBtn.onClick.AddListener(LoadFromModel);
         
         // 文件管理
+        UIFileManagementPanel.MainPanel = this;
         FileManagementBtn.OnValueChanged += value => UIFileManagementPanel.SetShowHide(value);
         UIFileManagementPanel.OnHide += () => FileManagementBtn.SetValue(false, false);
         UIFileManagementPanel.Hide();
@@ -55,7 +71,7 @@ public class UIMainPanel : UIBasePanel
 
     private void SaveToModel()
     {
-        var nodeGraph = UINodeGraph.ToAST();
+        var nodeGraph = SelectedNodeGraphUI.ToAST();
         _savedGraphXml = nodeGraph.ToXml();
         Debug.Log(_savedGraphXml);
         Debug.Log("Graph saved to string.");
@@ -66,7 +82,7 @@ public class UIMainPanel : UIBasePanel
         if (_savedGraphXml != null)
         {
             var nodeGraph = NodeGraph.FromXml(_savedGraphXml);
-            UINodeGraph.CreateFromGraph(nodeGraph);
+            SelectedNodeGraphUI.RestoreFromGraph(nodeGraph);
             Debug.Log("Graph loaded from string.");
         }
         else
@@ -77,7 +93,7 @@ public class UIMainPanel : UIBasePanel
 
     private void GenCode()
     {
-        var nodeGraph = UINodeGraph.ToAST();
+        var nodeGraph = SelectedNodeGraphUI.ToAST();
         var cb = new CodeBuilder();
         nodeGraph.ToCode(cb);
         

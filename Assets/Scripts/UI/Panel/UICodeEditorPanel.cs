@@ -1,6 +1,6 @@
-﻿using TMPro;
+﻿using System;
 
 public class UICodeEditorPanel : UIWindowPanel
 {
-    public TMP_InputField CodeInput;
+    [NonSerialized] public TMPro.TMP_InputField CodeInput;
 }

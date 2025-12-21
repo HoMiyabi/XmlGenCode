@@ -63,5 +63,29 @@ public class NodeGraph
 
     public void ToCode(CodeBuilder cb)
     {
+        if (nodes == null) return;
+
+        // 1. 处理函数定义 (DefineJsProcedureNode)
+        foreach (var node in nodes)
+        {
+            if (node is DefineJsProcedureNode defineNode)
+            {
+                defineNode.ToCode(cb);
+                cb.AppendLine();
+            }
+        }
+
+        // 2. 处理入口节点 (StartNode)
+        var startNodes = nodes.OfType<StartNode>().ToList();
+        if (startNodes.Count > 0)
+        {
+            if (startNodes.Count > 1)
+            {
+                Debug.LogWarning($"Found {startNodes.Count} StartNodes in NodeGraph, only the first one will be processed.");
+            }
+
+            // 处理第一个 StartNode
+            startNodes[0].ToCode(cb);
+        }
     }
 }

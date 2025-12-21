@@ -12,6 +12,10 @@ public abstract class StatementNode : BaseNode
         while (node != null)
         {
             node.ToCode(cb);
+            if (node.next != null)
+            {
+                cb.AppendLine();
+            }
             node = node.next;
         }
     }

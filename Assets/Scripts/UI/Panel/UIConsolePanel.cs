@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UIConsolePanel : UIWindowPanel
 {
-    public RectTransform LogRoot;
-    public ScrollRect ScrollRect;
+    [NonSerialized] public UnityEngine.RectTransform LogRoot;
+    [NonSerialized] public UnityEngine.UI.ScrollRect LogScroll;
 
     protected override void Start()
     {
@@ -29,7 +30,7 @@ public class UIConsolePanel : UIWindowPanel
         var logItem = UIMgr.Instance.Add<UILogItem>(LogRoot);
         logItem.Text.text = log;
         LayoutRebuilder.ForceRebuildLayoutImmediate(LogRoot);
-        ScrollRect.verticalNormalizedPosition = 0;
+        LogScroll.verticalNormalizedPosition = 0;
     }
 
     private void ClearLogs()

@@ -15,7 +15,7 @@ public abstract class BaseNodeUI : UIBaseView, IBeginDragHandler, IDragHandler, 
     
     private Vector2 prevMousePosLS;
     
-    public UINodeGraph NodeGraph { get; private set; }
+    public NodeGraphUI NodeGraph { get; private set; }
     
     private NodeInfo NodeInfo { get; set; }
 
@@ -31,7 +31,7 @@ public abstract class BaseNodeUI : UIBaseView, IBeginDragHandler, IDragHandler, 
     {
     }
 
-    public void Set(UINodeGraph nodeGraph, NodeInfo nodeInfo)
+    public void Set(NodeGraphUI nodeGraph, NodeInfo nodeInfo)
     {
         NodeInfo = nodeInfo;
         

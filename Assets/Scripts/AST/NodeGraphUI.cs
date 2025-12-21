@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine.UI;
 
-public class UINodeGraph : UIBaseView, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler, IPointerClickHandler
+public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler, IPointerClickHandler
 {
     [NonSerialized] public UITip                     Tip;
     [NonSerialized] public UnityEngine.RectTransform NodeRoot;
@@ -47,7 +47,7 @@ public class UINodeGraph : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
         }
     }
 
-    public void CreateFromGraph(NodeGraph graph)
+    public void RestoreFromGraph(NodeGraph graph)
     {
         InitCache();
         

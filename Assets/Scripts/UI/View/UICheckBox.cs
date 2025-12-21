@@ -11,10 +11,6 @@ public class UICheckBox : UIBaseView, IPointerEnterHandler, IPointerExitHandler,
     public Color hoverColor = Color.white;
     public Color selectedColor = Color.white;
 
-    public event Action<bool> OnValueChanged;
-    
-    public bool Value { get; private set; }
-
     public enum EState
     {
         Normal, // 默认
@@ -24,19 +20,29 @@ public class UICheckBox : UIBaseView, IPointerEnterHandler, IPointerExitHandler,
 
     private EState State { get; set; }
     
+    public bool Value
+    {
+        get => State == EState.Selected;
+        set => SetValue(value);
+    }
+    public event Action<bool> OnValueChanged;
+    
     private bool isPointerInside;
 
     #region UI事件
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (State != EState.Selected)
+        if (eventData.button == PointerEventData.InputButton.Left)
         {
-            SetState(EState.Selected);
-        }
-        else
-        {
-            SetState(EState.Hover);
+            if (State != EState.Selected)
+            {
+                SetState(EState.Selected);
+            }
+            else
+            {
+                SetState(EState.Hover);
+            }
         }
     }
 
@@ -83,10 +89,8 @@ public class UICheckBox : UIBaseView, IPointerEnterHandler, IPointerExitHandler,
     {
         if (State == newState) return;
         
-        State = newState;
-        
         bool oldValue = Value;
-        Value = State == EState.Selected;
+        State = newState;
 
         if (notify && (oldValue != Value))
         {
