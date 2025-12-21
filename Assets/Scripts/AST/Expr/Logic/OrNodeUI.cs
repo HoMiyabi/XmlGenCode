@@ -1,0 +1,23 @@
+﻿using System.Collections.Generic;
+
+[ShowName("或")]
+[ASTModel(typeof(OrNode))]
+public class OrNodeUI : ExprNodeUI
+{
+    public UIExprInputPort A;
+    public UIExprInputPort B;
+
+    public override void SolveModelConnection(Dictionary<BaseNodeUI, BaseNode> uiToModel, BaseNode node)
+    {
+        var model = (OrNode)node;
+        model.A = A.GetModel(uiToModel);
+        model.B = B.GetModel(uiToModel);
+    }
+
+    public override void SolveUIConnection(Dictionary<BaseNode, BaseNodeUI> modelToUI, BaseNode node)
+    {
+        var model = (OrNode)node;
+        A.Connect(modelToUI, model.A);
+        B.Connect(modelToUI, model.B);
+    }
+}

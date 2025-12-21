@@ -1,15 +1,23 @@
-﻿[ShowName("打印")]
+﻿using System.Collections.Generic;
+
+[ShowName("打印")]
+[ASTModel(typeof(PrintNode))]
 public class PrintNodeUI : StatementNodeUI
 {
     [ShowName("输入")]
-    public UIExpressionInputPort input;
+    public UIExprInputPort input;
 
-    public override BaseNode ToAST()
+    public override void SolveModelConnection(Dictionary<BaseNodeUI, BaseNode> uiToModel, BaseNode node)
     {
-        return new PrintNode
-        {
-            next = next.ToAST(),
-            input = input.ToAST()
-        };
+        base.SolveModelConnection(uiToModel, node);
+        var model = (PrintNode)node;
+        model.input = input.GetModel(uiToModel);
+    }
+
+    public override void SolveUIConnection(Dictionary<BaseNode, BaseNodeUI> modelToUI, BaseNode node)
+    {
+        base.SolveUIConnection(modelToUI, node);
+        var model = (PrintNode)node;
+        input.Connect(modelToUI, model.input);
     }
 }

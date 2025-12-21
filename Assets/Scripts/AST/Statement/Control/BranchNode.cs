@@ -1,9 +1,15 @@
-﻿public class BranchNode : StatementNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public class BranchNode : StatementNode
 {
-    public ExpressionNode condition;
+    [DataMember]
+    public ExprNode condition;
     
+    [DataMember]
     public StatementNode trueBody;
     
+    [DataMember]
     public StatementNode falseBody;
 
     public override void ToCode(CodeBuilder cb)

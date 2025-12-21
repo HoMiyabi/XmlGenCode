@@ -1,6 +1,10 @@
-﻿public class PrintNode : StatementNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public class PrintNode : StatementNode
 {
-    public ExpressionNode input;
+    [DataMember]
+    public ExprNode input;
 
     public override void ToCode(CodeBuilder cb)
     {

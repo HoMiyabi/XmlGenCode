@@ -62,6 +62,7 @@ public class UICheckBox : UIBaseView, IPointerEnterHandler, IPointerExitHandler,
 
     protected override void Awake()
     {
+        base.Awake();
         SetState(EState.Normal);
     }
     

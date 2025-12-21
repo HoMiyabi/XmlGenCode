@@ -1,8 +1,13 @@
-﻿[ShowName("开始")]
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
 public class StartNode : FuncDeclNode
 {
+    [DataMember]
+    public StatementNode next;
+    
     public override void ToCode(CodeBuilder cb)
     {
-        throw new System.NotImplementedException();
+        StatementNode.ToCodeList(cb, next);
     }
 }

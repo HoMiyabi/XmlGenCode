@@ -1,19 +1,25 @@
-﻿public class DefineJsProcedureNode : FuncDeclNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public class DefineJsProcedureNode : FuncDeclNode
 {
-    public string ProcedureName { get; set; }
-    public string Code { get; set; }
+    [DataMember]
+    public string procedureName;
+    
+    [DataMember]
+    public string code;
 
     public override void ToCode(CodeBuilder cb)
     {
-        cb.AppendWithIndent($"function {ProcedureName}() {{");
+        cb.AppendWithIndent($"function {procedureName}() {{");
         cb.AppendLine();
         cb.PushIndent();
     
         // 使用新方法处理多行代码
-        cb.AppendMultilineWithIndent(Code);
+        cb.AppendMultilineWithIndent(code);
     
         // 如果代码不为空且不以换行符结尾，则添加换行
-        if (!string.IsNullOrEmpty(Code) && !Code.EndsWith("\n") && !Code.EndsWith("\r\n"))
+        if (!string.IsNullOrEmpty(code) && !code.EndsWith("\n") && !code.EndsWith("\r\n"))
         {
             cb.AppendLine();
         }

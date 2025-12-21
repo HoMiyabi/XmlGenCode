@@ -1,10 +1,14 @@
-﻿public abstract class StatementNode : BaseNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public abstract class StatementNode : BaseNode
 {
+    [DataMember]
     public StatementNode next;
     
     public static void ToCodeList(CodeBuilder cb, StatementNode first)
     {
-        StatementNode node = first;
+        var node = first;
         while (node != null)
         {
             node.ToCode(cb);

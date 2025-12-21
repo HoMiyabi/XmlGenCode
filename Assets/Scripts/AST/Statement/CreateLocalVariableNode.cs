@@ -1,8 +1,12 @@
-﻿public class CreateLocalVariableNode : StatementNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public class CreateLocalVariableNode : StatementNode
 {
+    [DataMember]
     public string varName;
     
-    public ExpressionNode value;
+    public ExprNode value;
 
     public override void ToCode(CodeBuilder cb)
     {

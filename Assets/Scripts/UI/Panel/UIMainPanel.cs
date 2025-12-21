@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 public class UIMainPanel : UIBasePanel
 {
@@ -22,6 +23,8 @@ public class UIMainPanel : UIBasePanel
     
     private readonly PuerTSRunner runner = new();
 
+    private string _savedGraphXml;
+
     protected override void Start()
     {
         base.Start();
@@ -31,8 +34,8 @@ public class UIMainPanel : UIBasePanel
         GenCodeAndRunBtn.onClick.AddListener(GenCodeAndRun);
 
         // 保存和加载按钮
-        // SaveBtn.onClick.AddListener(SaveToModel);
-        // LoadBtn.onClick.AddListener(LoadFromModel);
+        SaveBtn.onClick.AddListener(SaveToModel);
+        LoadBtn.onClick.AddListener(LoadFromModel);
         
         // 文件管理
         FileManagementBtn.OnValueChanged += value => UIFileManagementPanel.SetShowHide(value);
@@ -46,19 +49,40 @@ public class UIMainPanel : UIBasePanel
 
         // 代码编辑器
         CodeEditorBtn.OnValueChanged += value => UICodeEditorPanel.SetShowHide(value);
-        UICodeEditorPanel.OnHide += () => CodeEditorBtn.SetValue(false, false);
+        UIConsolePanel.OnHide += () => CodeEditorBtn.SetValue(false, false);
         UICodeEditorPanel.Hide();
+    }
+
+    private void SaveToModel()
+    {
+        var nodeGraph = UINodeGraph.ToAST();
+        _savedGraphXml = nodeGraph.ToXml();
+        Debug.Log(_savedGraphXml);
+        Debug.Log("Graph saved to string.");
+    }
+
+    private void LoadFromModel()
+    {
+        if (_savedGraphXml != null)
+        {
+            var nodeGraph = NodeGraph.FromXml(_savedGraphXml);
+            UINodeGraph.CreateFromGraph(nodeGraph);
+            Debug.Log("Graph loaded from string.");
+        }
+        else
+        {
+            Debug.LogWarning("No saved graph found.");
+        }
     }
 
     private void GenCode()
     {
-        throw new NotImplementedException();
-        // var block = UINodeGraph.GetBlockGraph();
-        // var sb = new CodeBuilder();
-        // block.ToCode(sb);
-        //
-        // string code = sb.ToString();
-        // CodeEditorPanel.CodeInput.text = code;
+        var nodeGraph = UINodeGraph.ToAST();
+        var cb = new CodeBuilder();
+        nodeGraph.ToCode(cb);
+        
+        string code = cb.ToString();
+        UICodeEditorPanel.CodeInput.text = code;
     }
 
     private void Run()

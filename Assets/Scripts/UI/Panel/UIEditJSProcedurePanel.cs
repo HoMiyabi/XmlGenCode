@@ -70,15 +70,21 @@ public class UIEditJSProcedurePanel : UIWindowPanel
         CodeInput.onValueChanged.AddListener(OnCodeInputValueChange);
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        TitleBar.CloseBtn.onClick.AddListener(Close);
+    }
+
     public void Set(DefineJsProcedureNodeUI node)
     {
         this.node = node;
-        CodeInput.SetTextWithoutNotify(node.Code);
+        CodeInput.SetTextWithoutNotify(node.code);
     }
 
     private void OnCodeInputValueChange(string value)
     {
-        node.Code = value;
+        node.code = value;
     }
 
     private bool CanSend(string text)
@@ -198,7 +204,7 @@ public class UIEditJSProcedurePanel : UIWindowPanel
         await AddUIMessage(userMessage);
 
         // 添加代码消息到模型层
-        var codeMessage = new MyAIMessage(ChatCompletionRole.User, node.Code);
+        var codeMessage = new MyAIMessage(ChatCompletionRole.User, node.code);
         AddModelLayerMessage(codeMessage);
 
         // 从池中获取StringBuilder

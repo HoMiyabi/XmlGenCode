@@ -1,8 +1,13 @@
-﻿public class SetVariableNode : StatementNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public class SetVariableNode : StatementNode
 {
+    [DataMember]
     public string varName;
     
-    public ExpressionNode value;
+    [DataMember]
+    public ExprNode value;
 
     public override void ToCode(CodeBuilder cb)
     {

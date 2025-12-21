@@ -7,8 +7,7 @@ public class UIContextMenuPanel : UIBasePanel
     [NonSerialized] public UnityEngine.UI.Button     BgBtn;
     [NonSerialized] public UnityEngine.RectTransform Box;
     [NonSerialized] public UnityEngine.RectTransform Content;
-
-    public GameObject UIContextMenuItemPrefab;
+    
     public Vector2    Offset        = new Vector2(0, 10);
     public float      BottomPadding = 10f;
 
@@ -28,8 +27,13 @@ public class UIContextMenuPanel : UIBasePanel
 
     public void AddItem(string text, Action callback = null)
     {
-        var item = UIMgr.Instance.Add<UIContextMenuItem>(UIContextMenuItemPrefab, Content);
+        var item = UIMgr.Instance.Add<UIContextMenuItem>(Content);
         item.Set(text, Close + callback);
+    }
+    
+    public void AddDivider()
+    {
+        UIMgr.Instance.Add("UIContextMenuDivider", Content);
     }
 
     public void Finish(Vector2 screenPos, Camera cam)

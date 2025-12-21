@@ -1,81 +1,125 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public abstract class BaseNodeUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
-    [NonSerialized] public TMPro.TextMeshProUGUI     NameText;
-    [NonSerialized] public UnityEngine.RectTransform Input;
-    [NonSerialized] public UnityEngine.RectTransform OutPut;
+    [NonSerialized] public TMPro.TextMeshProUGUI     TitleText;
+    [NonSerialized] public UnityEngine.RectTransform InputRoot;
+    [NonSerialized] public UnityEngine.RectTransform OutPutRoot;
+    [NonSerialized] public UnityEngine.RectTransform ButtonRoot;
+    [NonSerialized] public UnityEngine.UI.Image      TitleColor;
     
     private Vector2 prevMousePosLS;
     
+    public UINodeGraph NodeGraph { get; private set; }
+    
     private NodeInfo NodeInfo { get; set; }
 
-    public void Set(NodeInfo nodeInfo)
+    public abstract void SolveModelConnection(Dictionary<BaseNodeUI, BaseNode> uiToModel, BaseNode node);
+    public abstract void SolveUIConnection(Dictionary<BaseNode, BaseNodeUI> modelToUI, BaseNode node);
+    
+    // 创建节点时调用，从model恢复不调用
+    public virtual void OnCreateToGraph()
+    {
+    }
+
+    public virtual void OnRestoreToGraph()
+    {
+    }
+
+    public void Set(UINodeGraph nodeGraph, NodeInfo nodeInfo)
     {
         NodeInfo = nodeInfo;
-        NameText.text = nodeInfo.ShowName;
+        
+        NodeGraph = nodeGraph;
+        
+        TitleText.text = nodeInfo.TitleText;
+        TitleColor.color = nodeInfo.TitleColor;
     }
-    
-    public abstract BaseNode ToAST();
+
+    protected override void Awake()
+    {
+        base.Awake();
+        
+        InputRoot.DestroyChildren();
+        OutPutRoot.DestroyChildren();
+        ButtonRoot.DestroyChildren();
+        
+        BuildUI();
+    }
+
+    private void AddNodeUIElement(FieldInfo fieldInfo, RectTransform root)
+    {
+        var port = (NodeUIElement)UIMgr.Instance.Add(fieldInfo.FieldType, root);
+
+        port.BaseNodeUI = this;
+        port.SetText(NodeUIRegistry.GetShowName(fieldInfo));
+        
+        fieldInfo.SetValue(this, port);
+    }
 
     protected virtual void BuildUI()
     {
         var type = GetType();
-        var fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        
+        var fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.Instance)
+            .Where(x => x.GetValue(this) == null)
+            .ToList();
+        
+        var inputFieldInfos = fieldInfos
+            .Where(x => typeof(IInput).IsAssignableFrom(x.FieldType))
+            .OrderByDescending(x =>
+            {
+                int order = NodeUIRegistry.GetOrder(x);
+                if (x.FieldType == typeof(UIExecInputPort))
+                {
+                    order += 10000;
+                }
+                return order;
+            })
+            .ToList();
+        
+        var outputFieldInfos = fieldInfos
+            .Where(x => typeof(IOutput).IsAssignableFrom(x.FieldType))
+            .OrderByDescending(x =>
+            {
+                int order = NodeUIRegistry.GetOrder(x);
+                if (x.FieldType == typeof(UIExecOutputPort))
+                {
+                    order += 10000;
+                }
+                return order;
+            })
+            .ToList();
+        
+        var btnFieldInfos = fieldInfos
+            .Where(x => typeof(INodeBtn).IsAssignableFrom(x.FieldType))
+            .OrderByDescending(x =>
+            {
+                int order = NodeUIRegistry.GetOrder(x);
+                return order;
+            })
+            .ToArray();
 
-        foreach (var fieldInfo in fieldInfos)
+        foreach (var inputFieldInfo in inputFieldInfos)
         {
-            if (fieldInfo.FieldType == typeof(UIExecInputPort) &&
-                fieldInfo.GetValue(this) == null)
-            {
-                var port = UIMgr.Instance.Add<UIExecInputPort>(AssetMgr.Instance.UIExecInputPort, Input);
-                fieldInfo.SetValue(this, port);
-            }
-            else if (fieldInfo.FieldType == typeof(UIExecOutputPort) &&
-                     fieldInfo.GetValue(this) == null)
-            {
-                var port = UIMgr.Instance.Add<UIExecOutputPort>(AssetMgr.Instance.UIExecOutputPort, OutPut);
-                fieldInfo.SetValue(this, port);
-            }
+            AddNodeUIElement(inputFieldInfo, InputRoot);
         }
         
-        foreach (var fieldInfo in fieldInfos)
+        foreach (var outputFieldInfo in outputFieldInfos)
         {
-            if (fieldInfo.FieldType == typeof(UIExpressionInputPort) &&
-                fieldInfo.GetValue(this) == null)
-            {
-                var port = UIMgr.Instance.Add<UIExpressionInputPort>(AssetMgr.Instance.UIDataInputPort, Input);
-                port.Set(GetShowName(fieldInfo));
-                fieldInfo.SetValue(this, port);
-            }
-            else if (fieldInfo.FieldType == typeof(UIExpressionOutputPort) &&
-                     fieldInfo.GetValue(this) == null)
-            {
-                var port = UIMgr.Instance.Add<UIExpressionOutputPort>(AssetMgr.Instance.UIDataOutputPort, OutPut);
-                port.Set(GetShowName(fieldInfo));
-                fieldInfo.SetValue(this, port);
-            }
+            AddNodeUIElement(outputFieldInfo, OutPutRoot);
         }
-    }
-    
-    private static string GetShowName(MemberInfo element)
-    {
-        var attr = element.GetCustomAttribute<ShowNameAttribute>();
-        if (attr != null)
-        {
-            return attr.Name;
-        }
-        return element.Name;
-    }
-
-    protected void AddDataInputPort()
-    {
         
+        foreach (var btnFieldInfo in btnFieldInfos)
+        {
+            AddNodeUIElement(btnFieldInfo, ButtonRoot);
+        }
     }
-    
 
     protected virtual void OnAddToGraph()
     {
@@ -117,7 +161,7 @@ public abstract class BaseNodeUI : UIBaseView, IBeginDragHandler, IDragHandler, 
     {
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            var panel = UIMgr.Instance.AddTop<UIContextMenuPanel>(AssetMgr.Instance.UIContextMenuPanel);
+            var panel = UIMgr.Instance.AddTop<UIContextMenuPanel>();
             panel.AddItem("删除", () =>
             {
                 Destroy(gameObject);

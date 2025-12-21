@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using Newtonsoft.Json;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class UIMgr : UnitySingleton<UIMgr>
 {
@@ -12,13 +15,48 @@ public class UIMgr : UnitySingleton<UIMgr>
         return panel;
     }
 
-    public T AddTop<T>(GameObject prefab)
+    public T AddTop<T>()
     {
-        return Instantiate(prefab, topLayer).GetComponent<T>();
+        var prefab = GetPrefab(typeof(T).Name);
+        var go = Instantiate(prefab, topLayer);
+        return go.GetComponent<T>();
+    }
+    
+
+    public T Add<T>(Transform parent)
+    {
+        return Add<T>(typeof(T).Name, parent);
+    }
+    
+    public T Add<T>(string prefabName, Transform parent)
+    {
+        var prefab = GetPrefab(prefabName);
+        var go = Instantiate(prefab, parent);
+        return go.GetComponent<T>();
+    }
+    
+    public Object Add(Type type, Transform parent)
+    {
+        var prefab = GetPrefab(type.Name);
+        var go = Instantiate(prefab, parent);
+        return go.GetComponent(type);
     }
 
-    public T Add<T>(GameObject prefab, Transform parent)
+    public Transform Add(string prefabName, Transform parent)
     {
-        return Instantiate(prefab, parent).GetComponent<T>();
+        var prefab = GetPrefab(prefabName);
+        var go = Instantiate(prefab, parent);
+        return go.transform;
+    }
+
+    private static GameObject GetPrefab(string prefabName)
+    {
+        string path = $"Prefab/{prefabName}";
+        var prefab = Resources.Load<GameObject>(path);
+        if (prefab == null)
+        {
+            Debug.LogError($"未找到资源, path: {path}");
+        }
+        return prefab;
     }
 }

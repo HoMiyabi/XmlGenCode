@@ -1,38 +1,45 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿using System;
+using System.Collections.Generic;
 
 [ShowName("定义JS过程")]
+[ASTModel(typeof(DefineJsProcedureNode))]
 public class DefineJsProcedureNodeUI : FuncDeclNodeUI
 {
-    [SerializeField] private UIVariableField ProcedureName;
-    [SerializeField] private Button EditBtn;
+    [ShowName("过程名")]
+    public UITextInput procedureName;
+    
+    [ShowName("编辑")]
+    public UINodeBtn editBtn;
 
-    private static int id = 1;
-
-    public string Code { get; set; } = "";
+    public string code = "";
 
     protected override void Start()
     {
         base.Start();
-        EditBtn.onClick.AddListener(() =>
+        
+        editBtn.Btn.onClick.AddListener(() =>
         {
             UIMgr.Instance.OpenPanel<UIEditJSProcedurePanel>().Set(this);
         });
     }
 
-    protected override void OnAddToGraph()
+    public override void OnCreateToGraph()
     {
-        base.OnAddToGraph();
-        ProcedureName.Input.interactable = true;
-        ProcedureName.Input.text = $"procedure{id++}";
+        base.OnCreateToGraph();
+        procedureName.Input.text = $"procedure_{Guid.NewGuid().ToString("N")[..4]}";
     }
 
-    public override BaseNode ToAST()
+    public override void SolveModelConnection(Dictionary<BaseNodeUI, BaseNode> uiToModel, BaseNode node)
     {
-        return new DefineJsProcedureNode
-        {
-            ProcedureName = ProcedureName.Text,
-            Code = Code,
-        };
+        var model = (DefineJsProcedureNode)node;
+        model.procedureName = procedureName.ToAST();
+        model.code = code;
+    }
+
+    public override void SolveUIConnection(Dictionary<BaseNode, BaseNodeUI> modelToUI, BaseNode node)
+    {
+        var model = (DefineJsProcedureNode)node;
+        procedureName.Input.text = model.procedureName;
+        code = model.code;
     }
 }

@@ -1,7 +1,12 @@
-﻿public class WhileNode : StatementNode
+﻿using System.Runtime.Serialization;
+
+[DataContract(IsReference = true)]
+public class WhileNode : StatementNode
 {
-    public ExpressionNode condition;
+    [DataMember]
+    public ExprNode condition;
     
+    [DataMember]
     public StatementNode loopBody;
 
     public override void ToCode(CodeBuilder cb)

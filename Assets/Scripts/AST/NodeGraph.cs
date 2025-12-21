@@ -2,25 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
-using System.Xml.Serialization;
+using System.Xml;
 using UnityEngine;
 
 public class NodeGraph
 {
-    public Vector2 blockRootAnchoredPosition;
-    public float blockRootLocalScale;
-    // public List<BlockGroup> blockGroups = new();
+    [DataMember]
+    public Vector2 position;
+    [DataMember]
+    public float scale;
+    [DataMember]
+    public List<BaseNode> nodes;
 
     public static Type[] XmlExtraTypes { get; } = GetXmlExtraTypes();
-
-    public string WriteXml()
-    {
-        var serializer = new XmlSerializer(GetType(), XmlExtraTypes);
-        using var ms = new MemoryStream();
-        serializer.Serialize(ms, this);
-        return Encoding.UTF8.GetString(ms.ToArray());
-    }
 
     private static Type[] GetXmlExtraTypes()
     {
@@ -28,23 +24,44 @@ public class NodeGraph
         return list.ToArray();
     }
 
+    public string ToXml()
+    {
+        var settings = new XmlWriterSettings
+        {
+            Indent = true,
+            IndentChars = "  ",
+            Encoding = Encoding.UTF8,
+        };
+        using (var ms = new MemoryStream())
+        {
+            using (var writer = XmlWriter.Create(ms, settings))
+            {
+                var serializer = new DataContractSerializer(typeof(NodeGraph), new DataContractSerializerSettings
+                {
+                    KnownTypes = XmlExtraTypes,
+                    PreserveObjectReferences = true
+                });
+                serializer.WriteObject(writer, this);
+            }
+            return Encoding.UTF8.GetString(ms.ToArray());
+        }
+    }
+
+    public static NodeGraph FromXml(string xml)
+    {
+        using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
+        using (var reader = XmlReader.Create(ms))
+        {
+            var serializer = new DataContractSerializer(typeof(NodeGraph), new DataContractSerializerSettings
+            {
+                KnownTypes = XmlExtraTypes,
+                PreserveObjectReferences = true
+            });
+            return (NodeGraph)serializer.ReadObject(reader);
+        }
+    }
+
     public void ToCode(CodeBuilder cb)
     {
-        // var blocks = blockGroups
-        //     .Where(b => b.first is DefineJsProcedureNode or StartNode)
-        //     .OrderBy(b =>
-        //     {
-        //         return b.first switch
-        //         {
-        //             DefineJsProcedureNode => 0,
-        //             StartNode => 2,
-        //             _ => 1
-        //         };
-        //     }).ToList();
-        //
-        // foreach (var block in blocks)
-        // {
-        //     block.first.ToCode(cb);
-        // }
     }
 }

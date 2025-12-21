@@ -137,10 +137,8 @@ MonoBehaviour:
   items:
   - varName: ChatText
     component: {fileID: 5924224394821855407}
-  - varName: UIChatItem
+  - varName: LayoutGroup
     component: {fileID: 8404578484706049854}
-  - varName: ChatBubble
-    component: {fileID: 6853123934614054370}
 --- !u!114 &2750057751270743466
 MonoBehaviour:
   m_ObjectHideFlags: 0

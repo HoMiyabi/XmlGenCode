@@ -1,11 +1,12 @@
-﻿using Betalgo.Ranul.OpenAI.Contracts.Enums;
+﻿using System;
+using Betalgo.Ranul.OpenAI.Contracts.Enums;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UIAIChatItem : UIBaseView
 {
-    [SerializeField] private TMPro.TMP_Text ChatText;
-    [SerializeField] private HorizontalLayoutGroup LayoutGroup;
+    [NonSerialized] public TMPro.TextMeshProUGUI                ChatText;
+    [NonSerialized] public UnityEngine.UI.HorizontalLayoutGroup LayoutGroup;
+    
     private MyAIMessage message;
 
     public MyAIMessage Message

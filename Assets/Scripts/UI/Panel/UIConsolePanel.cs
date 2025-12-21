@@ -4,7 +4,6 @@ using UnityEngine.UI;
 public class UIConsolePanel : UIWindowPanel
 {
     public RectTransform LogRoot;
-    public GameObject LogItemPrefab;
     public ScrollRect ScrollRect;
 
     protected override void Start()
@@ -27,7 +26,7 @@ public class UIConsolePanel : UIWindowPanel
 
     private void AddLog(string log)
     {
-        var logItem = Instantiate(LogItemPrefab, LogRoot).GetComponent<UILogItem>();
+        var logItem = UIMgr.Instance.Add<UILogItem>(LogRoot);
         logItem.Text.text = log;
         LayoutRebuilder.ForceRebuildLayoutImmediate(LogRoot);
         ScrollRect.verticalNormalizedPosition = 0;
