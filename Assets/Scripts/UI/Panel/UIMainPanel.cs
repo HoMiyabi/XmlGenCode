@@ -1,5 +1,7 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class UIMainPanel : UIBasePanel
 {
@@ -20,18 +22,77 @@ public class UIMainPanel : UIBasePanel
     [NonSerialized] public UnityEngine.UI.Button     LoadBtn;
     [NonSerialized] public UnityEngine.RectTransform NodeGraphUIRoot;
     
-    private readonly PuerTSRunner runner = new();
+    private readonly PuerTSRunner       runner         = new();
+    private readonly List<NodeGraphUI> nodeGraphUIs   = new();
+    private          NodeGraphUI       selectedNodeGraphUI;
 
-    private string _savedGraphXml;
-    public NodeGraphUI SelectedNodeGraphUI { get; set; }
+    public NodeGraphUI SelectedNodeGraphUI
+    {
+        get => selectedNodeGraphUI;
+        set
+        {
+            if (selectedNodeGraphUI == value) return;
+            if (selectedNodeGraphUI != null) selectedNodeGraphUI.gameObject.SetActive(false);
+            selectedNodeGraphUI = value;
+            if (selectedNodeGraphUI != null) selectedNodeGraphUI.gameObject.SetActive(true);
+        }
+    }
+
+    public void ClearNodeGraphs()
+    {
+        foreach (var graph in nodeGraphUIs)
+        {
+            Destroy(graph.gameObject);
+        }
+        nodeGraphUIs.Clear();
+        selectedNodeGraphUI = null;
+    }
 
     public NodeGraphUI AddNodeGraphUI(string content)
     {
-        var nodeGraph = NodeGraph.FromXml(content);
+        NodeGraph nodeGraph;
+        if (string.IsNullOrEmpty(content))
+        {
+            nodeGraph = new NodeGraph
+            {
+                position = Vector2.zero,
+                scale = 1f,
+                nodes = new List<BaseNode>()
+            };
+        }
+        else
+        {
+            nodeGraph = NodeGraph.FromXml(content);
+        }
+        
         var nodeGraphUI = UIMgr.Instance.Add<NodeGraphUI>(NodeGraphUIRoot);
         nodeGraphUI.RestoreFromGraph(nodeGraph);
-        
+        nodeGraphUI.gameObject.SetActive(false);
+        nodeGraphUIs.Add(nodeGraphUI);
+
         return nodeGraphUI;
+    }
+
+    public void SelectNodeGraph(int index)
+    {
+        if (index >= 0 && index < nodeGraphUIs.Count)
+        {
+            SelectedNodeGraphUI = nodeGraphUIs[index];
+        }
+    }
+
+    public void RemoveNodeGraph(int index)
+    {
+        if (index >= 0 && index < nodeGraphUIs.Count)
+        {
+            var graph = nodeGraphUIs[index];
+            if (SelectedNodeGraphUI == graph)
+            {
+                SelectedNodeGraphUI = null;
+            }
+            nodeGraphUIs.RemoveAt(index);
+            Destroy(graph.gameObject);
+        }
     }
 
     protected override void Awake()
@@ -48,12 +109,16 @@ public class UIMainPanel : UIBasePanel
         RunBtn.onClick.AddListener(Run);
         GenCodeAndRunBtn.onClick.AddListener(GenCodeAndRun);
 
-        // 保存和加载按钮
-        SaveBtn.onClick.AddListener(SaveToModel);
-        LoadBtn.onClick.AddListener(LoadFromModel);
+        // 保存按钮
+        SaveBtn.onClick.AddListener(SaveToFile);
         
         // 文件管理
-        UIFileManagementPanel.MainPanel = this;
+        UIFileManagementPanel.OnFilesCleared += ClearNodeGraphs;
+        UIFileManagementPanel.OnFileAdded += content => AddNodeGraphUI(content);
+        UIFileManagementPanel.OnFileSelected += SelectNodeGraph;
+        UIFileManagementPanel.OnFileRemoved += RemoveNodeGraph;
+        UIFileManagementPanel.Init();
+
         FileManagementBtn.OnValueChanged += value => UIFileManagementPanel.SetShowHide(value);
         UIFileManagementPanel.OnHide += () => FileManagementBtn.SetValue(false, false);
         UIFileManagementPanel.Hide();
@@ -69,30 +134,16 @@ public class UIMainPanel : UIBasePanel
         UICodeEditorPanel.Hide();
     }
 
-    private void SaveToModel()
+    private void SaveToFile()
     {
-        var nodeGraph = SelectedNodeGraphUI.ToAST();
-        _savedGraphXml = nodeGraph.ToXml();
-        Debug.Log(_savedGraphXml);
-        Debug.Log("Graph saved to string.");
-    }
-
-    private void LoadFromModel()
-    {
-        if (_savedGraphXml != null)
-        {
-            var nodeGraph = NodeGraph.FromXml(_savedGraphXml);
-            SelectedNodeGraphUI.RestoreFromGraph(nodeGraph);
-            Debug.Log("Graph loaded from string.");
-        }
-        else
-        {
-            Debug.LogWarning("No saved graph found.");
-        }
+        if (SelectedNodeGraphUI == null) return;
+        string xml = SelectedNodeGraphUI.ToAST().ToXml();
+        UIFileManagementPanel.UpdateFileContent(xml).Forget();
     }
 
     private void GenCode()
     {
+        if (SelectedNodeGraphUI == null) return;
         var nodeGraph = SelectedNodeGraphUI.ToAST();
         var cb = new CodeBuilder();
         nodeGraph.ToCode(cb);

@@ -13,7 +13,6 @@ public class PuerTSRunner
         
         var asset = Resources.Load<TextAsset>("PuerTSSetUp.js");
         setUpStr = asset.text;
-        Object.Destroy(asset);
     }
     
     public void Run(string code)

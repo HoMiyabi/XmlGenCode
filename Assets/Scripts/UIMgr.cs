@@ -1,4 +1,5 @@
 ﻿using System;
+using KiraraDirectBinder;
 using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -23,16 +24,18 @@ public class UIMgr : UnitySingleton<UIMgr>
     }
     
 
-    public T Add<T>(Transform parent)
+    public T Add<T>(Transform parent) where T : MonoBehaviour
     {
         return Add<T>(typeof(T).Name, parent);
     }
     
-    public T Add<T>(string prefabName, Transform parent)
+    public T Add<T>(string prefabName, Transform parent) where T : MonoBehaviour
     {
         var prefab = GetPrefab(prefabName);
         var go = Instantiate(prefab, parent);
-        return go.GetComponent<T>();
+        var com = go.GetComponent<T>();
+        com.BindUI();
+        return com;
     }
     
     public Object Add(Type type, Transform parent)
