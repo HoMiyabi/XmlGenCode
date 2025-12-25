@@ -24,16 +24,10 @@ public class UIFileManagementPanel : UIWindowPanel
     
     private const string BaseUrl = "http://localhost:5000";
 
-    protected override void Start()
-    {
-        base.Start();
-        
-        CreateBtn.onClick.AddListener(() => CreateFile().Forget());
-        FileItemRoot.DestroyChildren();
-    }
-
     public void Init()
     {
+        CreateBtn.onClick.AddListener(() => CreateFile().Forget());
+        FileItemRoot.DestroyChildren();
         GetFiles().Forget();
     }
 
@@ -74,17 +68,6 @@ public class UIFileManagementPanel : UIWindowPanel
         if (result != null && result.IsSuccess)
         {
             FileList.Clear();
-            if (result.Data != null)
-            {
-                FileList.AddRange(result.Data);
-            }
-
-            if (FileList.Count == 0)
-            {
-                await CreateFile();
-                return;
-            }
-            
             FileItemRoot.DestroyChildren();
             UIFileItemList.Clear();
             SelectedItem = null;
@@ -92,12 +75,16 @@ public class UIFileManagementPanel : UIWindowPanel
 
             OnFilesCleared?.Invoke();
 
-            foreach (var file in FileList)
+            if (result.Data == null || result.Data.Count == 0)
+            {
+                await CreateFile();
+                return;
+            }
+
+            foreach (var file in result.Data)
             {
                 DecodeFileContent(file);
-                Debug.Log(file.FileContent);
-                AddFileItem(file);
-                OnFileAdded?.Invoke(file.FileContent);
+                AddFile(file);
             }
 
             if (UIFileItemList.Count > 0)
@@ -134,7 +121,15 @@ public class UIFileManagementPanel : UIWindowPanel
         return Convert.ToBase64String(data);
     }
 
-    private UIFileItem AddFileItem(FileModel fileModel)
+    private UIFileItem AddFile(FileModel fileModel)
+    {
+        FileList.Add(fileModel);
+        var item = AddUIFileItem(fileModel);
+        OnFileAdded?.Invoke(fileModel.FileContent);
+        return item;
+    }
+
+    private UIFileItem AddUIFileItem(FileModel fileModel)
     {
         var item = UIMgr.Instance.Add<UIFileItem>(FileItemRoot);
         item.Set(fileModel.FileName, eventData => FileItem_OnClick(eventData, item, fileModel));
@@ -152,6 +147,7 @@ public class UIFileManagementPanel : UIWindowPanel
         {
             var menu = UIMgr.Instance.AddTop<UIContextMenuPanel>();
             menu.AddItem("重命名", () => RenameFile(fileModel).Forget());
+            menu.AddItem("复制", () => DuplicateFile(fileModel).Forget());
             menu.AddItem("删除", () => DeleteFile(fileModel).Forget());
             menu.Finish(eventData.position, eventData.pressEventCamera);
         }
@@ -171,9 +167,7 @@ public class UIFileManagementPanel : UIWindowPanel
         {
             var fileModel = result.Data;
             DecodeFileContent(fileModel);
-            FileList.Add(fileModel);
-            var item = AddFileItem(fileModel);
-            OnFileAdded?.Invoke(fileModel.FileContent);
+            var item = AddFile(fileModel);
             SelectFile(item, fileModel);
         }
         else
@@ -206,6 +200,22 @@ public class UIFileManagementPanel : UIWindowPanel
         }
     }
     
+    private async UniTask DuplicateFile(FileModel fileModel)
+    {
+        var result = await PostRequest<FileModel>("/duplicate_file", new { Id = fileModel.Id });
+        if (result != null && result.IsSuccess)
+        {
+            var newFileModel = result.Data;
+            DecodeFileContent(newFileModel);
+            AddFile(newFileModel);
+            Debug.Log($"File duplicated: {newFileModel.FileName} (Id: {newFileModel.Id})");
+        }
+        else
+        {
+            Debug.LogError($"Failed to duplicate file: {result?.Msg}");
+        }
+    }
+
     private async UniTask DeleteFile(FileModel fileModel)
     {
         var result = await PostRequest<object>("/delete_file", new { Id = fileModel.Id });
