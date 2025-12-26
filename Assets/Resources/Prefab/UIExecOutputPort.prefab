@@ -123,6 +123,36 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6309540445260675588}
     m_Modifications:
+    - target: {fileID: 1441615885568872495, guid: ea280e11235c15f4dbd106dd45318ccb,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2834348725661544365, guid: ea280e11235c15f4dbd106dd45318ccb,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2834348725661544365, guid: ea280e11235c15f4dbd106dd45318ccb,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2834348725661544365, guid: ea280e11235c15f4dbd106dd45318ccb,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2834348725661544365, guid: ea280e11235c15f4dbd106dd45318ccb,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 5206272034563930392, guid: ea280e11235c15f4dbd106dd45318ccb,
+        type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5315961198641338765, guid: ea280e11235c15f4dbd106dd45318ccb,
         type: 3}
       propertyPath: m_Material
