@@ -33,9 +33,9 @@ RectTransform:
   m_Father: {fileID: 1153199977381949593}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 5, y: 0}
-  m_SizeDelta: {x: -10, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1151786450046218667
 CanvasRenderer:
@@ -144,12 +144,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1153199977381949593}
-  - component: {fileID: 5687429582869851113}
   - component: {fileID: 1404081779025323070}
   - component: {fileID: 8814359481434736575}
   - component: {fileID: 317888825723247700}
   - component: {fileID: 746091893930948116}
   - component: {fileID: 786615592763397878}
+  - component: {fileID: 7760206599075696997}
   m_Layer: 5
   m_Name: UIFileItem
   m_TagString: Untagged
@@ -177,26 +177,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5687429582869851113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4021990971687301949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreLayout: 0
-  m_MinWidth: -1
-  m_MinHeight: 35
-  m_PreferredWidth: -1
-  m_PreferredHeight: -1
-  m_FlexibleWidth: -1
-  m_FlexibleHeight: -1
-  m_LayoutPriority: 1
 --- !u!222 &1404081779025323070
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -250,7 +230,6 @@ MonoBehaviour:
   targetGraphic: {fileID: 8814359481434736575}
   normalColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   selectedColor: {r: 0.29411766, g: 0.43137255, b: 0.6862745, a: 1}
-  FileNameText: {fileID: 0}
 --- !u!114 &746091893930948116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,3 +259,29 @@ MonoBehaviour:
   items:
   - varName: Text
     component: {fileID: 6428378649600448401}
+--- !u!114 &7760206599075696997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4021990971687301949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 10
+    m_Right: 10
+    m_Top: 5
+    m_Bottom: 5
+  m_ChildAlignment: 3
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0

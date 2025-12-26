@@ -17,6 +17,9 @@ public class UIConnectionLine : MaskableGraphic
     private RectTransform _rectTransform;
     private RectTransform _parentRect;
 
+    private readonly List<Vector2> _cachedPoints = new List<Vector2>();
+    private bool _pointsDirty = true;
+
     protected override void Awake()
     {
         base.Awake();
@@ -33,20 +36,28 @@ public class UIConnectionLine : MaskableGraphic
     {
         if (StartPort != null)
         {
-            StartPoint = GetLocalPoint(StartPort.PortPoint.RectTransform.position);
+            var newStart = GetLocalPoint(StartPort.PortPoint.RectTransform.position);
+            if (Vector2.Distance(StartPoint, newStart) > 0.01f)
+            {
+                StartPoint = newStart;
+                _pointsDirty = true;
+            }
         }
 
         if (EndPort != null)
         {
-            EndPoint = GetLocalPoint(EndPort.PortPoint.RectTransform.position);
-        }
-        else
-        {
-            // If EndPort is null, it might be following the mouse
-            // EndPoint should be set externally in that case
+            var newEnd = GetLocalPoint(EndPort.PortPoint.RectTransform.position);
+            if (Vector2.Distance(EndPoint, newEnd) > 0.01f)
+            {
+                EndPoint = newEnd;
+                _pointsDirty = true;
+            }
         }
 
-        SetVerticesDirty();
+        if (_pointsDirty)
+        {
+            SetVerticesDirty();
+        }
     }
 
     private Vector2 GetLocalPoint(Vector3 worldPos)
@@ -56,45 +67,73 @@ public class UIConnectionLine : MaskableGraphic
         return localPoint;
     }
 
-    protected override void OnPopulateMesh(VertexHelper vh)
+    public IReadOnlyList<Vector2> GetBezierPoints()
     {
-        vh.Clear();
+        if (!_pointsDirty && _cachedPoints.Count == Segments + 1)
+        {
+            return _cachedPoints;
+        }
 
+        _cachedPoints.Clear();
         Vector2 p0 = StartPoint;
         Vector2 p3 = EndPoint;
 
         // Determine control points
-        // 0 and 1 horizontal, 2 and 3 horizontal
         Vector2 p1 = p0 + Vector2.right * ControlPointDistance;
         Vector2 p2 = p3 + Vector2.left * ControlPointDistance;
 
-        // If StartPort is an input, it should go left
         if (StartPort != null && StartPort is IInput)
         {
             p1 = p0 + Vector2.left * ControlPointDistance;
         }
         
-        // If EndPort is an output, it should go right
         if (EndPort != null && EndPort is IOutput)
         {
             p2 = p3 + Vector2.right * ControlPointDistance;
         }
         else if (EndPort == null)
         {
-            // If we are dragging from an input, we expect to connect to an output, so the line should approach from the right
             if (StartPort != null && StartPort is IInput)
             {
                 p2 = p3 + Vector2.right * ControlPointDistance;
             }
         }
 
-        List<Vector2> points = new List<Vector2>();
         for (int i = 0; i <= Segments; i++)
         {
             float t = i / (float)Segments;
-            points.Add(CalculateBezierPoint(t, p0, p1, p2, p3));
+            _cachedPoints.Add(MathUtils.CalculateBezierPoint(t, p0, p1, p2, p3));
+        }
+        
+        _pointsDirty = false;
+        return _cachedPoints;
+    }
+
+    public bool IsIntersecting(IList<Vector2> cuttingPoints)
+    {
+        if (cuttingPoints == null || cuttingPoints.Count < 2) return false;
+
+        var linePoints = GetBezierPoints();
+        
+        for (int i = 0; i < cuttingPoints.Count - 1; i++)
+        {
+            for (int j = 0; j < linePoints.Count - 1; j++)
+            {
+                if (MathUtils.SegmentsIntersect(cuttingPoints[i], cuttingPoints[i + 1], linePoints[j], linePoints[j + 1]))
+                {
+                    return true;
+                }
+            }
         }
 
+        return false;
+    }
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        vh.Clear();
+
+        var points = GetBezierPoints();
         if (points.Count < 2) return;
 
         float halfWidth = Width * 0.5f;
@@ -130,19 +169,17 @@ public class UIConnectionLine : MaskableGraphic
         }
     }
 
-    private Vector2 CalculateBezierPoint(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+    public void SetEndPoint(Vector2 localPoint)
     {
-        float u = 1 - t;
-        float tt = t * t;
-        float uu = u * u;
-        float uuu = uu * u;
-        float ttt = tt * t;
+        if (Vector2.Distance(EndPoint, localPoint) > 0.01f)
+        {
+            EndPoint = localPoint;
+            _pointsDirty = true;
+            SetVerticesDirty();
+        }
+    }
 
-        Vector2 p = uuu * p0;
-        p += 3 * uu * t * p1;
-        p += 3 * u * tt * p2;
-        p += ttt * p3;
-
-        return p;
+    public void SetConnected(bool isConnected)
+    {
     }
 }

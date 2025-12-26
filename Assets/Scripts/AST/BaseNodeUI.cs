@@ -7,11 +7,11 @@ using UnityEngine.EventSystems;
 
 public abstract class BaseNodeUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
-    [NonSerialized] public TMPro.TextMeshProUGUI     TitleText;
-    [NonSerialized] public UnityEngine.RectTransform InputRoot;
-    [NonSerialized] public UnityEngine.RectTransform OutPutRoot;
-    [NonSerialized] public UnityEngine.RectTransform ButtonRoot;
-    [NonSerialized] public UnityEngine.UI.Image      TitleColor;
+    [NonSerialized] public TMPro.TextMeshProUGUI                                    TitleText;
+    [NonSerialized] public UnityEngine.RectTransform                                InputRoot;
+    [NonSerialized] public UnityEngine.RectTransform                                OutPutRoot;
+    [NonSerialized] public UnityEngine.RectTransform                                ButtonRoot;
+    [NonSerialized] public Nobi.UiRoundedCorners.ImageWithIndependentRoundedCorners TitleBg;
     
     private Vector2 prevMousePosLS;
     
@@ -38,7 +38,9 @@ public abstract class BaseNodeUI : UIBaseView, IBeginDragHandler, IDragHandler, 
         NodeGraph = nodeGraph;
         
         TitleText.text = nodeInfo.TitleText;
-        TitleColor.color = nodeInfo.TitleColor;
+        
+        TitleBg.color1 = nodeInfo.TitleBgColor.leftColor;
+        TitleBg.color2 = nodeInfo.TitleBgColor.rightColor;
     }
 
     protected override void Awake()

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+[ASTModel(typeof(StatementNode))]
+[TitleBgColor(197, 210, 83, 197, 210, 83)]
 public abstract class StatementNodeUI : BaseNodeUI
 {
     [ShowName("")]

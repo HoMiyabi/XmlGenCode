@@ -12,6 +12,12 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
     [NonSerialized] public UnityEngine.RectTransform NodeRoot;
     [NonSerialized] public UnityEngine.RectTransform GraphRoot;
     [NonSerialized] public UnityEngine.RectTransform ConnectionLineRoot;
+
+    [Header("Connection Line Settings")]
+    public Color ExecLineColor = Color.white;
+    public float ExecLineWidth = 5f;
+    public Color DataLineColor = Color.green;
+    public float DataLineWidth = 3f;
     
     private float MinScale = 0.6f;
     private float MaxScale = 3f;
@@ -99,19 +105,20 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
         line.StartPort = startPort;
         line.EndPort = endPort;
         line.UpdatePoints();
+        line.SetConnected(true);
         
         startPort.Connection = line;
         endPort.Connection = line;
         
         if (startPort is UIExecInputPort || startPort is UIExecOutputPort)
         {
-            line.color = Color.white;
-            line.Width = 5f;
+            line.color = ExecLineColor;
+            line.Width = ExecLineWidth;
         }
         else
         {
-            line.color = Color.green;
-            line.Width = 3f;
+            line.color = DataLineColor;
+            line.Width = DataLineWidth;
         }
     }
 
@@ -161,13 +168,12 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
         return graph;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (IsConnecting && _tempLine != null)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(ConnectionLineRoot, Input.mousePosition, null, out var localPoint);
-            _tempLine.EndPoint = localPoint;
-            _tempLine.SetVerticesDirty();
+            _tempLine.SetEndPoint(localPoint);
         }
     }
 
@@ -245,7 +251,7 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
         foreach (var line in lines)
         {
             if (line == _tempLine) continue;
-            if (IsLineIntersectingCuttingLine(line))
+            if (line.IsIntersecting(_cuttingLine.Points))
             {
                 toDelete.Add(line);
             }
@@ -257,66 +263,6 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
             if (line.EndPort != null) line.EndPort.Connection = null;
             Destroy(line.gameObject);
         }
-    }
-
-    private bool IsLineIntersectingCuttingLine(UIConnectionLine line)
-    {
-        // 获取连线的贝塞尔点
-        Vector2 p0 = line.StartPoint;
-        Vector2 p3 = line.EndPoint;
-        Vector2 p1 = p0 + Vector2.right * line.ControlPointDistance;
-        Vector2 p2 = p3 + Vector2.left * line.ControlPointDistance;
-
-        if (line.StartPort != null && line.StartPort is IInput) p1 = p0 + Vector2.left * line.ControlPointDistance;
-        if (line.EndPort != null && line.EndPort is IOutput) p2 = p3 + Vector2.right * line.ControlPointDistance;
-
-        List<Vector2> linePoints = new List<Vector2>();
-        for (int i = 0; i <= line.Segments; i++)
-        {
-            float t = i / (float)line.Segments;
-            linePoints.Add(CalculateBezierPoint(t, p0, p1, p2, p3));
-        }
-
-        // 检查切割线段与连线段的交点
-        for (int i = 0; i < _cuttingLine.Points.Count - 1; i++)
-        {
-            for (int j = 0; j < linePoints.Count - 1; j++)
-            {
-                if (SegmentsIntersect(_cuttingLine.Points[i], _cuttingLine.Points[i + 1], linePoints[j], linePoints[j + 1]))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private Vector2 CalculateBezierPoint(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
-    {
-        float u = 1 - t;
-        float tt = t * t;
-        float uu = u * u;
-        float uuu = uu * u;
-        float ttt = tt * t;
-
-        Vector2 p = uuu * p0;
-        p += 3 * uu * t * p1;
-        p += 3 * u * tt * p2;
-        p += ttt * p3;
-
-        return p;
-    }
-
-    private bool SegmentsIntersect(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
-    {
-        float denominator = (b.x - a.x) * (d.y - c.y) - (b.y - a.y) * (d.x - c.x);
-        if (denominator == 0) return false;
-
-        float t = ((c.x - a.x) * (d.y - c.y) - (c.y - a.y) * (d.x - c.x)) / denominator;
-        float u = ((c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x)) / denominator;
-
-        return t >= 0 && t <= 1 && u >= 0 && u <= 1;
     }
 
     public void StartConnect(NodeUIPort port)
@@ -341,17 +287,18 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
         
         if (_startPort is UIExecInputPort || _startPort is UIExecOutputPort)
         {
-            _tempLine.color = Color.white;
-            _tempLine.Width = 5f;
+            _tempLine.color = ExecLineColor;
+            _tempLine.Width = ExecLineWidth;
         }
         else
         {
-            _tempLine.color = Color.green;
-            _tempLine.Width = 3f;
+            _tempLine.color = DataLineColor;
+            _tempLine.Width = DataLineWidth;
         }
 
         _tempLine.UpdatePoints();
-        _tempLine.EndPoint = _tempLine.StartPoint;
+        _tempLine.SetEndPoint(_tempLine.StartPoint);
+        _tempLine.SetConnected(false);
     }
 
     public void FinishConnect(NodeUIPort endPort)
@@ -394,6 +341,7 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
             // 建立永久连接
             _tempLine.EndPort = endPort;
             _tempLine.UpdatePoints();
+            _tempLine.SetConnected(true);
             
             _startPort.Connection = _tempLine;
             endPort.Connection = _tempLine;

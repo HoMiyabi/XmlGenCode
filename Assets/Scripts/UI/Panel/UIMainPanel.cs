@@ -22,9 +22,9 @@ public class UIMainPanel : UIBasePanel
     [NonSerialized] public UnityEngine.UI.Button     LoadBtn;
     [NonSerialized] public UnityEngine.RectTransform NodeGraphUIRoot;
     
-    private readonly PuerTSRunner       runner         = new();
-    private readonly List<NodeGraphUI> nodeGraphUIs   = new();
-    private          NodeGraphUI       selectedNodeGraphUI;
+    private readonly PuerTSRunner                 runner         = new();
+    private readonly Dictionary<int, NodeGraphUI> nodeGraphUIs   = new();
+    private          NodeGraphUI                  selectedNodeGraphUI;
 
     public NodeGraphUI SelectedNodeGraphUI
     {
@@ -32,24 +32,21 @@ public class UIMainPanel : UIBasePanel
         set
         {
             if (selectedNodeGraphUI == value) return;
-            if (selectedNodeGraphUI != null) selectedNodeGraphUI.gameObject.SetActive(false);
+            if (selectedNodeGraphUI != null)
+            {
+                selectedNodeGraphUI.gameObject.SetActive(false);
+            }
             selectedNodeGraphUI = value;
-            if (selectedNodeGraphUI != null) selectedNodeGraphUI.gameObject.SetActive(true);
+            if (selectedNodeGraphUI != null)
+            {
+                selectedNodeGraphUI.gameObject.SetActive(true);
+            }
         }
     }
 
-    public void ClearNodeGraphs()
+    public NodeGraphUI AddNodeGraphUI(FileModel fileModel)
     {
-        foreach (var graph in nodeGraphUIs)
-        {
-            Destroy(graph.gameObject);
-        }
-        nodeGraphUIs.Clear();
-        selectedNodeGraphUI = null;
-    }
-
-    public NodeGraphUI AddNodeGraphUI(string content)
-    {
+        string content = fileModel.FileContent;
         NodeGraph nodeGraph;
         if (string.IsNullOrEmpty(content))
         {
@@ -68,29 +65,28 @@ public class UIMainPanel : UIBasePanel
         var nodeGraphUI = UIMgr.Instance.Add<NodeGraphUI>(NodeGraphUIRoot);
         nodeGraphUI.RestoreFromGraph(nodeGraph);
         nodeGraphUI.gameObject.SetActive(false);
-        nodeGraphUIs.Add(nodeGraphUI);
+        nodeGraphUIs[fileModel.Id] = nodeGraphUI;
 
         return nodeGraphUI;
     }
 
-    public void SelectNodeGraph(int index)
+    public void SelectNodeGraph(int id)
     {
-        if (index >= 0 && index < nodeGraphUIs.Count)
+        if (nodeGraphUIs.TryGetValue(id, out var graph))
         {
-            SelectedNodeGraphUI = nodeGraphUIs[index];
+            SelectedNodeGraphUI = graph;
         }
     }
 
-    public void RemoveNodeGraph(int index)
+    public void DeleteNodeGraph(int id)
     {
-        if (index >= 0 && index < nodeGraphUIs.Count)
+        if (nodeGraphUIs.TryGetValue(id, out var graph))
         {
-            var graph = nodeGraphUIs[index];
             if (SelectedNodeGraphUI == graph)
             {
                 SelectedNodeGraphUI = null;
             }
-            nodeGraphUIs.RemoveAt(index);
+            nodeGraphUIs.Remove(id);
             Destroy(graph.gameObject);
         }
     }
@@ -113,11 +109,20 @@ public class UIMainPanel : UIBasePanel
         SaveBtn.onClick.AddListener(SaveToFile);
         
         // 文件管理
-        UIFileManagementPanel.OnFilesCleared += ClearNodeGraphs;
-        UIFileManagementPanel.OnFileAdded += content => AddNodeGraphUI(content);
-        UIFileManagementPanel.OnFileSelected += SelectNodeGraph;
-        UIFileManagementPanel.OnFileRemoved += RemoveNodeGraph;
-        UIFileManagementPanel.Init();
+        // 初始化已存在的文件
+        foreach (var file in FileMgr.Instance.FileList)
+        {
+            AddNodeGraphUI(file);
+        }
+
+        if (FileMgr.Instance.SelectedFile != null)
+        {
+            SelectNodeGraph(FileMgr.Instance.SelectedFile.Id);
+        }
+
+        FileMgr.Instance.OnFileAdded += file => AddNodeGraphUI(file);
+        FileMgr.Instance.OnFileSelected += SelectNodeGraph;
+        FileMgr.Instance.OnFileDeleted += DeleteNodeGraph;
 
         FileManagementBtn.OnValueChanged += value => UIFileManagementPanel.SetShowHide(value);
         UIFileManagementPanel.OnHide += () => FileManagementBtn.SetValue(false, false);
@@ -130,7 +135,7 @@ public class UIMainPanel : UIBasePanel
 
         // 代码编辑器
         CodeEditorBtn.OnValueChanged += value => UICodeEditorPanel.SetShowHide(value);
-        UIConsolePanel.OnHide += () => CodeEditorBtn.SetValue(false, false);
+        UICodeEditorPanel.OnHide += () => CodeEditorBtn.SetValue(false, false);
         UICodeEditorPanel.Hide();
     }
 
@@ -138,7 +143,7 @@ public class UIMainPanel : UIBasePanel
     {
         if (SelectedNodeGraphUI == null) return;
         string xml = SelectedNodeGraphUI.ToAST().ToXml();
-        UIFileManagementPanel.UpdateFileContent(xml).Forget();
+        FileMgr.Instance.UpdateFileContent(xml).Forget();
     }
 
     private void GenCode()

@@ -1,4 +1,5 @@
-﻿using KiraraDirectBinder;
+﻿using System;
+using KiraraDirectBinder;
 using UnityEngine;
 
 public abstract class UIBaseView : MonoBehaviour
@@ -21,6 +22,10 @@ public abstract class UIBaseView : MonoBehaviour
     }
     
     protected virtual void Start()
+    {
+    }
+
+    protected virtual void OnDestroy()
     {
     }
 }

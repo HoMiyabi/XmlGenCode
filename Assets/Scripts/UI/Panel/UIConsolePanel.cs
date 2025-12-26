@@ -19,8 +19,9 @@ public class UIConsolePanel : UIWindowPanel
         PuerTSLogMgr.Instance.OnLogClear += ClearLogs;
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         PuerTSLogMgr.Instance.OnLogAdd -= AddLog;
         PuerTSLogMgr.Instance.OnLogClear -= ClearLogs;
     }

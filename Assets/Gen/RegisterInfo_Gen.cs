@@ -1,4 +1,5 @@
-﻿using Puerts;
+﻿using Puerts.TypeMapping;
+using Puerts;
 
 namespace PuertsStaticWrap
 {

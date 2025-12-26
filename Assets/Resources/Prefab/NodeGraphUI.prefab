@@ -564,6 +564,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1d77c4976184830966512a24a595a8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ExecLineColor: {r: 1, g: 1, b: 1, a: 1}
+  ExecLineWidth: 5
+  DataLineColor: {r: 0.3764706, g: 0.5019608, b: 0.7411765, a: 1}
+  DataLineWidth: 2
 --- !u!114 &832950780816198290
 MonoBehaviour:
   m_ObjectHideFlags: 0

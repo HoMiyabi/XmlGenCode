@@ -2,6 +2,7 @@
 
 [ShowName("分支")]
 [ASTModel(typeof(BranchNode))]
+[TitleBgColor(253, 146, 92, 253, 146, 92)]
 public class BranchNodeUI : StatementNodeUI
 {
     [ShowName("条件")]

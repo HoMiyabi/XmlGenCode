@@ -29,16 +29,21 @@ public abstract class NodeUIPort : NodeUIElement
         }
     }
 
-    protected virtual void OnConnectionChanged() { }
+    protected virtual void OnConnectionChanged()
+    {
+        PortPoint.SetConnected(IsConnected);
+    }
 
     protected override void Start()
     {
         base.Start();
         PortPoint.OnPointerClickEvent += OnPointerClick;
+        PortPoint.SetConnected(IsConnected);
     }
 
-    protected virtual void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
         if (Connection != null)
         {
             if (Connection.gameObject != null)

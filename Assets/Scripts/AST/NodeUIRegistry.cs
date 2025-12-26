@@ -22,7 +22,7 @@ public static class NodeUIRegistry
             {
                 Type = t,
                 TitleText = GetShowName(t),
-                TitleColor = GetTitleColor(t)
+                TitleBgColor = GetTitleBgColor(t)
             })
             .ToList();
         
@@ -32,7 +32,7 @@ public static class NodeUIRegistry
             {
                 Type = t,
                 TitleText = GetShowName(t),
-                TitleColor = GetTitleColor(t)
+                TitleBgColor = GetTitleBgColor(t)
             })
             .ToList();
         
@@ -42,7 +42,7 @@ public static class NodeUIRegistry
             {
                 Type = t,
                 TitleText = GetShowName(t),
-                TitleColor = GetTitleColor(t)
+                TitleBgColor = GetTitleBgColor(t)
             })
             .ToList();
 
@@ -65,14 +65,14 @@ public static class NodeUIRegistry
         return element.Name;
     }
 
-    public static Color GetTitleColor(MemberInfo element)
+    public static (Color leftColor, Color rightColor) GetTitleBgColor(MemberInfo element)
     {
-        var attr = element.GetCustomAttribute<TitleColorAttribute>();
+        var attr = element.GetCustomAttribute<TitleBgColorAttribute>();
         if (attr != null)
         {
-            return attr.Color;
+            return (attr.LeftColor, attr.RightColor);
         }
-        return Color.black;
+        return (Color.white, Color.white);
     }
 
     public static int GetOrder(MemberInfo element)
