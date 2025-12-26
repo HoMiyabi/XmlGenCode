@@ -26,8 +26,8 @@ public class UIFileItem : UIBaseView, IPointerClickHandler
         Input.onEndEdit.AddListener(newName =>
         {
             _onCommit?.Invoke(newName);
-            SetInputInteractable(false);
-            Input.DeactivateInputField();
+            // 延迟到帧末尾执行，避免在 EventSystem 选择逻辑中同步修改 interactable 导致冲突
+            StartCoroutine(DelayDisableInput());
         });
 
         Input.onValueChanged.AddListener(_ =>
@@ -70,5 +70,12 @@ public class UIFileItem : UIBaseView, IPointerClickHandler
     {
         isSelected = value;
         targetGraphic.color = value ? selectedColor : normalColor;
+    }
+
+    private System.Collections.IEnumerator DelayDisableInput()
+    {
+        yield return null;
+        SetInputInteractable(false);
+        Input.DeactivateInputField();
     }
 }
