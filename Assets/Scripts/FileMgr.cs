@@ -11,7 +11,7 @@ public class FileMgr : UnitySingleton<FileMgr>
     public event Action<FileModel> OnFileAdded;
     public event Action<int>       OnFileSelected;
     public event Action<int>       OnFileDeleted;
-    public event Action<int, string> OnFileRenamed;
+    public event Action<FileModel> OnFileContentUpdated;
 
     public List<FileModel> FileList { get; } = new();
 
@@ -138,7 +138,7 @@ public class FileMgr : UnitySingleton<FileMgr>
         {
             var fileModel = FileList.Find(f => f.Id == id);
             fileModel.FileName = newName;
-            OnFileRenamed?.Invoke(fileModel.Id, newName);
+            Debug.Log($"File renamed: {fileModel.FileName} (Id: {fileModel.Id})");
         }
         else
         {
@@ -200,11 +200,12 @@ public class FileMgr : UnitySingleton<FileMgr>
         }
     }
 
-    public async UniTask UpdateFileContent(string xml)
+    public async UniTask UpdateFileContent(int id, string xml, bool triggerEvent = true)
     {
-        if (SelectedFile == null)
+        var fileModel = FileList.Find(f => f.Id == id);
+        if (fileModel == null)
         {
-            Debug.LogWarning("No file selected.");
+            Debug.LogWarning($"File with id {id} not found.");
             return;
         }
 
@@ -212,11 +213,15 @@ public class FileMgr : UnitySingleton<FileMgr>
         
         string base64Content = EncodeFileContent(xml);
 
-        var result = await PostRequest<object>("/update_file_content", new { Id = SelectedFile.Id, FileContent = base64Content });
+        var result = await PostRequest<object>("/update_file_content", new { Id = id, FileContent = base64Content });
         if (result != null && result.IsSuccess)
         {
             Debug.Log("File content updated successfully.");
-            SelectedFile.FileContent = xml;
+            fileModel.FileContent = xml;
+            if (triggerEvent)
+            {
+                OnFileContentUpdated?.Invoke(fileModel);
+            }
         }
         else
         {

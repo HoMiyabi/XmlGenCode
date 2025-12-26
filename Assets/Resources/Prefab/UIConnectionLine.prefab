@@ -71,4 +71,4 @@ MonoBehaviour:
   EndPoint: {x: 0, y: 0}
   ControlPointDistance: 100
   Width: 3
-  Segments: 30
+  Segments: 50

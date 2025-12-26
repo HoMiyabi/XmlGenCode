@@ -49,6 +49,16 @@ public class NodeGraph
 
     public static NodeGraph FromXml(string xml)
     {
+        if (string.IsNullOrEmpty(xml))
+        {
+            return new NodeGraph
+            {
+                position = Vector2.zero,
+                scale = 1f,
+                nodes = new List<BaseNode>()
+            };
+        }
+
         using (var ms = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
         using (var reader = XmlReader.Create(ms))
         {

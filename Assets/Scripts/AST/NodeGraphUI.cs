@@ -8,6 +8,7 @@ using UnityEngine.UI;
 
 public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDragHandler, IScrollHandler, IPointerClickHandler
 {
+    public int FileId { get; set; }
     [NonSerialized] public UITip                     Tip;
     [NonSerialized] public UnityEngine.RectTransform NodeRoot;
     [NonSerialized] public UnityEngine.RectTransform GraphRoot;
@@ -55,6 +56,9 @@ public class NodeGraphUI : UIBaseView, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void RestoreFromGraph(NodeGraph graph)
     {
+        CancelConnect();
+        FinishCutting();
+        
         InitCache();
         
         // 清理旧节点

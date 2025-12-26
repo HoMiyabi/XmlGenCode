@@ -53,6 +53,8 @@ public class UIEdgeBarController : UIBaseView
         
         RightPanel.OnShow += UpdatePanels;
         RightPanel.OnHide += UpdatePanels;
+
+        UpdatePanels();
     }
 
     private void UpdatePanels()

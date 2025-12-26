@@ -1,5 +1,4 @@
 ﻿using System;
-using KiraraDirectBinder;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,9 +9,11 @@ public class UIFileItem : UIBaseView, IPointerClickHandler
     public Color normalColor = Color.white;
     public Color selectedColor = Color.white;
     
-    [NonSerialized] public TMPro.TextMeshProUGUI Text;
+    [NonSerialized] public TMPro.TMP_InputField    Input;
+    [NonSerialized] public UnityEngine.CanvasGroup InputCanvasGroup;
     
     private bool isSelected;
+    private Action<string> _onCommit;
     
     public Action<PointerEventData> OnClick { get; set; }
 
@@ -20,17 +21,44 @@ public class UIFileItem : UIBaseView, IPointerClickHandler
     {
         base.Awake();
         SetSelected(false);
+        SetInputInteractable(false);
+        
+        Input.onEndEdit.AddListener(newName =>
+        {
+            _onCommit?.Invoke(newName);
+            SetInputInteractable(false);
+            Input.DeactivateInputField();
+        });
+
+        Input.onValueChanged.AddListener(_ =>
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(RectTransform);
+        });
     }
 
-    public void Set(string text, Action<PointerEventData> onClick)
+    public void Set(string text, Action<PointerEventData> onClick, Action<string> onCommit)
     {
-        Text.text = text;
+        Input.text = text;
         OnClick = onClick;
+        _onCommit = onCommit;
     }
 
     public void SetText(string text)
     {
-        Text.text = text;
+        Input.text = text;
+    }
+
+    public void StartEdit()
+    {
+        SetInputInteractable(true);
+        Input.ActivateInputField();
+        Input.caretPosition = Input.text.Length;
+    }
+
+    private void SetInputInteractable(bool value)
+    {
+        Input.interactable = value;
+        InputCanvasGroup.blocksRaycasts = value;
     }
     
     public void OnPointerClick(PointerEventData eventData)

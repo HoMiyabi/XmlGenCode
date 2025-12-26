@@ -2084,6 +2084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TitleBar: {fileID: 8806605807564640330}
+  Title: "\u7F16\u8F91JS\u8FC7\u7A0B\u8282\u70B9"
   AIChatItemPrefab: {fileID: 1011928077492228960, guid: bccd44eda3f3d2f488236c2eb0bdc5fc,
     type: 3}
 --- !u!114 &5469538256010336985
@@ -2556,25 +2557,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8511503195818444459}
     m_Modifications:
-    - target: {fileID: 1507872772883828357, guid: 36552f75a6c15ba4eaf8d2f280bab720,
-        type: 3}
-      propertyPath: Panel
-      value: 
-      objectReference: {fileID: 5631582558094384344}
-    - target: {fileID: 2885506608950242487, guid: 36552f75a6c15ba4eaf8d2f280bab720,
-        type: 3}
-      propertyPath: m_text
-      value: "\u7F16\u8F91JS\u8FC7\u7A0B\u5757"
-      objectReference: {fileID: 0}
     - target: {fileID: 7556032461383950470, guid: 36552f75a6c15ba4eaf8d2f280bab720,
         type: 3}
       propertyPath: m_Name
       value: TitleBar
-      objectReference: {fileID: 0}
-    - target: {fileID: 7556032461383950470, guid: 36552f75a6c15ba4eaf8d2f280bab720,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7759166450860100041, guid: 36552f75a6c15ba4eaf8d2f280bab720,
         type: 3}
@@ -2680,21 +2666,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Color.a
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9211278416923241880, guid: 36552f75a6c15ba4eaf8d2f280bab720,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 0.25490198
-      objectReference: {fileID: 0}
-    - target: {fileID: 9211278416923241880, guid: 36552f75a6c15ba4eaf8d2f280bab720,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 0.25490198
-      objectReference: {fileID: 0}
-    - target: {fileID: 9211278416923241880, guid: 36552f75a6c15ba4eaf8d2f280bab720,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 0.25490198
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

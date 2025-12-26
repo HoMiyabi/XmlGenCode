@@ -46,23 +46,10 @@ public class UIMainPanel : UIBasePanel
 
     public NodeGraphUI AddNodeGraphUI(FileModel fileModel)
     {
-        string content = fileModel.FileContent;
-        NodeGraph nodeGraph;
-        if (string.IsNullOrEmpty(content))
-        {
-            nodeGraph = new NodeGraph
-            {
-                position = Vector2.zero,
-                scale = 1f,
-                nodes = new List<BaseNode>()
-            };
-        }
-        else
-        {
-            nodeGraph = NodeGraph.FromXml(content);
-        }
+        NodeGraph nodeGraph = NodeGraph.FromXml(fileModel.FileContent);
         
         var nodeGraphUI = UIMgr.Instance.Add<NodeGraphUI>(NodeGraphUIRoot);
+        nodeGraphUI.FileId = fileModel.Id;
         nodeGraphUI.RestoreFromGraph(nodeGraph);
         nodeGraphUI.gameObject.SetActive(false);
         nodeGraphUIs[fileModel.Id] = nodeGraphUI;
@@ -120,9 +107,10 @@ public class UIMainPanel : UIBasePanel
             SelectNodeGraph(FileMgr.Instance.SelectedFile.Id);
         }
 
-        FileMgr.Instance.OnFileAdded += file => AddNodeGraphUI(file);
+        FileMgr.Instance.OnFileAdded += OnFileAdded;
         FileMgr.Instance.OnFileSelected += SelectNodeGraph;
         FileMgr.Instance.OnFileDeleted += DeleteNodeGraph;
+        FileMgr.Instance.OnFileContentUpdated += OnFileContentUpdated;
 
         FileManagementBtn.OnValueChanged += value => UIFileManagementPanel.SetShowHide(value);
         UIFileManagementPanel.OnHide += () => FileManagementBtn.SetValue(false, false);
@@ -143,7 +131,30 @@ public class UIMainPanel : UIBasePanel
     {
         if (SelectedNodeGraphUI == null) return;
         string xml = SelectedNodeGraphUI.ToAST().ToXml();
-        FileMgr.Instance.UpdateFileContent(xml).Forget();
+        FileMgr.Instance.UpdateFileContent(SelectedNodeGraphUI.FileId, xml, false).Forget();
+    }
+
+    private void OnFileAdded(FileModel file)
+    {
+        AddNodeGraphUI(file);
+    }
+
+    private void OnFileContentUpdated(FileModel fileModel)
+    {
+        if (nodeGraphUIs.TryGetValue(fileModel.Id, out var graphUI))
+        {
+            NodeGraph nodeGraph = NodeGraph.FromXml(fileModel.FileContent);
+            graphUI.RestoreFromGraph(nodeGraph);
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        FileMgr.Instance.OnFileAdded -= OnFileAdded;
+        FileMgr.Instance.OnFileSelected -= SelectNodeGraph;
+        FileMgr.Instance.OnFileDeleted -= DeleteNodeGraph;
+        FileMgr.Instance.OnFileContentUpdated -= OnFileContentUpdated;
     }
 
     private void GenCode()
